@@ -79,12 +79,12 @@ fun MyMainBottomBar(// TODO: Cambiar los colores, mejorar los comentarios.
                     onClick = { navController.navigate(AppScreens.AddRecipeScreen.route) }
                 )
 
-                // Icono personalizado para navegar a 'AccountScreen'. TODO: Modificar cuando se cree la screen necesaria
+                // Icono personalizado para navegar a 'AccountScreen'.
                 PersonalizedIconButton(
                     icon = Icons.Filled.AccountCircle,
                     contentDescription = "Account",
                     condition = screen.equals("Account"),
-                    onClick = { navController.navigate(AppScreens.MainScreen.route) }
+                    onClick = { navController.navigate(AppScreens.AccountScreen.route) }
                 )
             }
         }

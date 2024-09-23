@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.chefhub.screens.AccountScreen
 import com.example.chefhub.screens.AddRecipeScreen
 import com.example.chefhub.screens.LoginScreen
 import com.example.chefhub.screens.MainScreen
@@ -22,5 +23,6 @@ fun AppNavigation() {
         composable(route = AppScreens.PasswordRecoveryScreen.route) { PasswordRecoveryScreen(navController, appViewModel) }
         composable(route = AppScreens.MainScreen.route) { MainScreen(navController, appViewModel) }
         composable(route = AppScreens.AddRecipeScreen.route) { AddRecipeScreen(navController, appViewModel) }
+        composable(route = AppScreens.AccountScreen.route) { AccountScreen(navController, appViewModel) }
     }
 }

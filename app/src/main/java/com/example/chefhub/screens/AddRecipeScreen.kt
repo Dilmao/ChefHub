@@ -2,11 +2,12 @@ package com.example.chefhub.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -19,10 +20,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.chefhub.scaffold.MyMainBottomBar
-import com.example.chefhub.screens.components.PersonalizedLazyColumn
 import com.example.chefhub.screens.components.SimpleTextField
 import com.example.chefhub.ui.AppViewModel
 
@@ -52,65 +55,72 @@ fun AddRecipeScreenContent(navController: NavController, appViewModel: AppViewMo
     val context = LocalContext.current
 
     // COMENTARIO.
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp)
+            .padding(20.dp, bottom = 80.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // TODO: Arreglar los spacer
         // COMENTARIO.
-        Text("Nombre: ")
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // COMENTARIO.
-        SimpleTextField(
+        item { Text("Nombre: ", fontWeight = FontWeight.Bold, fontSize = 20.sp) }
+        item { SimpleTextField(
             value = appUiState.recipeTitle,
             onValueChange = { appViewModel.onRecipeTitleChanged(it) },
             label = "Nombre",
             required = true
-        )
-        Spacer(modifier = Modifier.height(20.dp))
+        ) }
+        item { Spacer(modifier = Modifier.height(30.dp)) }
 
-        // COMENTARIO.
-        Text("Ingredientes: ")
-        Spacer(modifier = Modifier.height(0.dp))
-
-        // COMENTARIO.
-        PersonalizedLazyColumn(
-            list = appUiState.ingredientList,
-            listName = "Ingredient",
-            label = "º Ingrediente",
-            appViewModel = appViewModel
-        )
-        Spacer(modifier = Modifier.height(15.dp))
-
-        // COMENTARIO.
-        Button(onClick = { appViewModel.onMutableListAddElement(appUiState.ingredientList, "Ingredient") }) {
-            Icon(Icons.Filled.Add, "Añadir ingrediente")
+        // Sección de ingredientes
+        item { Text("Ingredientes: ", fontWeight = FontWeight.Bold, fontSize = 20.sp) }
+        items(appUiState.ingredientList.size) { index ->
+            SimpleTextField(
+                value = appUiState.ingredientList[index],
+                onValueChange = { appViewModel.onMutableListChanged(it, index, appUiState.ingredientList, "Ingredient") },
+                label = "${index + 1}º Ingrediente",
+                required = false
+            )
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        item { Spacer(modifier = Modifier.height(10.dp)) }
 
-        // COMENTARIO.
-        Text("Instrucciones: ")
-        Spacer(modifier = Modifier.height(10.dp))
 
-        // COMENTARIO.
-        PersonalizedLazyColumn(
-            list = appUiState.instructionsList,
-            listName = "Instruction",
-            label = "ª Instrucción",
-            appViewModel = appViewModel
-        )
-        Spacer(modifier = Modifier.height(15.dp))
-
-        // COMENTARIO.
-        Button(onClick = { appViewModel.onMutableListAddElement(appUiState.instructionsList, "Instruction") }) {
-            Icon(Icons.Filled.Add, "Añadir instrucciones")
+        // Botón para añadir ingredientes
+        item {
+            Button(onClick = { appViewModel.onMutableListAddElement(appUiState.ingredientList, "Ingredient") }) {
+                Icon(Icons.Filled.Add, "Añadir ingrediente")
+            }
         }
+        item { Spacer(modifier = Modifier.height(30.dp)) }
 
-        // TODO: Botón para guardar la receta.
+        // Sección de instrucciones
+        item { Text("Instrucciones: ", fontWeight = FontWeight.Bold, fontSize = 20.sp) }
+        items(appUiState.instructionsList.size) { index ->
+            SimpleTextField(
+                value = appUiState.instructionsList[index],
+                onValueChange = { appViewModel.onMutableListChanged(it, index, appUiState.instructionsList, "Instruction") },
+                label = "${index + 1}ª Instrucción",
+                required = false
+            )
+        }
+        item { Spacer(modifier = Modifier.height(10.dp)) }
+
+        // Botón para añadir instrucciones
+        item {
+            Button(onClick = { appViewModel.onMutableListAddElement(appUiState.instructionsList, "Instruction") }) {
+                Icon(Icons.Filled.Add, "Añadir instrucciones")
+            }
+        }
+    }
+
+    // COMENTARIO.
+    Row(
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+    ) {
+        // Botón para guardar la receta.
         Button(onClick = { appViewModel.onSaveRecipe() }) {
             Text("Guardar receta")
         }

@@ -209,12 +209,10 @@ class AppViewModel {
         updatedList[index] = newValue
 
         // COMENTARIO.
-        _appUiState.update { currentState ->
-            when(listName) {
-                "Ingredient" -> currentState.copy(ingredientList = updatedList)
-                "instruction" -> currentState.copy(instructionsList = updatedList)
-                else -> throw IllegalArgumentException("El nombre de la lista '$listName' no es válido.")
-            }
+        _appUiState.value = when (listName) {
+            "Ingredient" -> appUiState.value.copy(ingredientList = updatedList)
+            "Instruction" -> appUiState.value.copy(instructionsList = updatedList)
+            else -> throw IllegalArgumentException("El nombre de la lista '$listName' no es válido.")
         }
     }
 
@@ -229,12 +227,10 @@ class AppViewModel {
         updatedList.add("")
 
         // COMENTARIO.
-        _appUiState.update { currentState ->
-            when(listName) {
-                "Ingredient" -> currentState.copy(ingredientList = updatedList)
-                "instruction" -> currentState.copy(instructionsList = updatedList)
-                else -> throw IllegalArgumentException("El nombre de la lista '$listName' no es válido.")
-            }
+        _appUiState.value = when (listName) {
+            "Ingredient" -> appUiState.value.copy(ingredientList = updatedList)
+            "Instruction" -> appUiState.value.copy(instructionsList = updatedList)
+            else -> throw IllegalArgumentException("El nombre de la lista '$listName' no es válido.")
         }
     }
 
