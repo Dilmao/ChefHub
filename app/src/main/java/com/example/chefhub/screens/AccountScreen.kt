@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.chefhub.R
+import com.example.chefhub.scaffold.MyAccountTopAppBar
 import com.example.chefhub.scaffold.MyMainBottomBar
 import com.example.chefhub.ui.AppViewModel
 
@@ -38,7 +39,7 @@ import com.example.chefhub.ui.AppViewModel
 fun AccountScreen(navController: NavController, appViewModel: AppViewModel) {
     // COMENTARIO.
     Scaffold(
-        topBar = {},
+        topBar = { MyAccountTopAppBar("[placeholder]", navController) },
         bottomBar = { MyMainBottomBar("Account", navController) }
     ) { paddingValues ->
         // COMENTARIO.
