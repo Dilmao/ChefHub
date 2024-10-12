@@ -46,14 +46,20 @@ fun AccountScreen(navController: NavController, appViewModel: AppViewModel) {
         drawerState = appUiState.drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                // COMENTARIO.
-                Text("Item 1")
-                Text("Item 2")
+                Column(
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.size(250.dp)
+                ) {
+                    // COMENTARIO.
+                    Text("Item 1")
+                    Text("Item 2")
+                }
             }
         }
     ) {
         Scaffold(
-            topBar = { MyAccountTopAppBar("[placeholder]", navController, appViewModel) },
+            topBar = { MyAccountTopAppBar("[placeholder]", appViewModel) },
             bottomBar = { MyMainBottomBar("Account", navController) }
         ) { paddingValues ->
             // COMENTARIO.
@@ -121,21 +127,21 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
         }
         Spacer(modifier = Modifier.height(10.dp))
 
-        // COMENTARIO. TODO: Esto deberia estar en la cuenta de otros usuarios, no la propia.
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp)
-        ) {
-            Button(
-                onClick = { /* TODO: Funcionalidad del botón. */ },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Seguir")
-            }
-        }
+        // TODO: Esto deberia estar en la cuenta de otros usuarios, no la propia.
+//        Row(
+//            horizontalArrangement = Arrangement.Center,
+//            verticalAlignment = Alignment.CenterVertically,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(start = 20.dp, end = 20.dp)
+//        ) {
+//            Button(
+//                onClick = { /* TODO: Funcionalidad del botón. */ },
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Text("Seguir")
+//            }
+//        }
         Spacer(modifier = Modifier.height(20.dp))
 
         // COMENTARIO.

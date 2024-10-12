@@ -40,8 +40,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MyAccountTopAppBar(// TODO: Cambiar los colores, mejorar los comentarios.
     titulo: String,                 // COMENTARIO.
-    navController: NavController,    // COMENTARIO.
-    appViewModel: AppViewModel
+    appViewModel: AppViewModel      // COMENTARIO.
 ) {
     // COMENTARIO.
     val scope = rememberCoroutineScope()
@@ -110,7 +109,7 @@ fun MyMainBottomBar(// TODO: Cambiar los colores, mejorar los comentarios.
 }
 
 @Composable
-fun PersonalizedIconButton(// TODO: Cambiar los colores, mejorar los comentarios.
+fun PersonalizedIconButton(// TODO: Mejorar los comentarios.
     icon: ImageVector,          // Icono que se mostrara.
     contentDescription: String, // Descripción del icono para accesibilidad.
     condition: Boolean,         // Condición para modificar la visibilidad del icono.

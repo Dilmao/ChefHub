@@ -10,7 +10,6 @@ import com.example.chefhub.screens.LoginScreen
 import com.example.chefhub.screens.MainScreen
 import com.example.chefhub.screens.PasswordRecoveryScreen
 import com.example.chefhub.screens.RegisterScreen
-import com.example.chefhub.screens.components.sideDropDown
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
@@ -25,7 +24,5 @@ fun AppNavigation() {
         composable(route = AppScreens.MainScreen.route) { MainScreen(navController, appViewModel) }
         composable(route = AppScreens.AddRecipeScreen.route) { AddRecipeScreen(navController, appViewModel) }
         composable(route = AppScreens.AccountScreen.route) { AccountScreen(navController, appViewModel) }
-
-        composable(route = AppScreens.TestScreen.route) { sideDropDown(navController, appViewModel) }
     }
 }
