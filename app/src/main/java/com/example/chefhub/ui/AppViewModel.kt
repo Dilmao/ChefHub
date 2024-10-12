@@ -1,6 +1,8 @@
 package com.example.chefhub.ui
 
 import android.content.Context
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import com.example.chefhub.screens.components.saveCredentials
 import com.example.chefhub.screens.components.showMessage
 import com.google.firebase.Firebase
@@ -236,5 +238,21 @@ class AppViewModel {
 
     fun onSaveRecipe() {
         // TODO: Función para guardar una receta.
+    }
+
+    /** Funciones AccountScreen **/
+    fun onChangeDrawerState() {
+        // COMENTARIO.
+        var drawerState = DrawerState(initialValue = DrawerValue.Closed)
+
+        // COMENTARIO.
+        if (appUiState.value.drawerState.isClosed) {
+            drawerState = DrawerState(initialValue = DrawerValue.Open)
+        }
+
+        // COMENTARIO.
+        _appUiState.update { currentState ->
+            currentState.copy(drawerState = drawerState)
+        }
     }
 }

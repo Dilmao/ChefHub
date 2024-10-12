@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -38,18 +39,32 @@ import com.example.chefhub.ui.AppViewModel
 @Composable
 fun AccountScreen(navController: NavController, appViewModel: AppViewModel) {
     // COMENTARIO.
-    Scaffold(
-        topBar = { MyAccountTopAppBar("[placeholder]", navController) },
-        bottomBar = { MyMainBottomBar("Account", navController) }
-    ) { paddingValues ->
-        // COMENTARIO.
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+    val appUiState by appViewModel.appUiState.collectAsState()
+
+    // COMENTARIO.
+    ModalNavigationDrawer(
+        drawerState = appUiState.drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                // COMENTARIO.
+                Text("Item 1")
+                Text("Item 2")
+            }
+        }
+    ) {
+        Scaffold(
+            topBar = { MyAccountTopAppBar("[placeholder]", navController, appViewModel) },
+            bottomBar = { MyMainBottomBar("Account", navController) }
+        ) { paddingValues ->
             // COMENTARIO.
-            AccountScreenContent(navController, appViewModel)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                // COMENTARIO.
+                AccountScreenContent(navController, appViewModel)
+            }
         }
     }
 }
@@ -60,7 +75,6 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
 
-    // TODO: Me he venido arriba con las columnas y filas, arreglalo por dios.
     // COMENTARIO.
     Column(
         verticalArrangement = Arrangement.Top,
@@ -68,60 +82,55 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
     ) {
         // COMENTARIO.
         Row(
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(10.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp)
         ) {
             // COMENTARIO.
-            Column(
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.Start
-            ) {
-                // COMENTARIO.
-                Image(
-                    painter = painterResource(id = R.drawable.icono_usuario_estandar),
-                    contentDescription = "Usuario",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(100.dp).clip(CircleShape)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // COMENTARIO.
-                Text("[placeholder]")
-            }
-            Spacer(modifier = Modifier.width(20.dp))
+            Image(
+                painter = painterResource(id = R.drawable.icono_usuario_estandar),
+                contentDescription = "Usuario",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+            )
 
             // COMENTARIO.
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                // COMENTARIO.
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    // COMENTARIO.
-                    Text("0\nRecetas", textAlign = TextAlign.Center)
+            Text("0\nRecetas", textAlign = TextAlign.Center)
 
-                    // COMENTARIO.
-                    Text("0\nSeguidores", textAlign = TextAlign.Center)
+            // COMENTARIO.
+            Text("0\nSeguidores", textAlign = TextAlign.Center)
 
-                    // COMENTARIO.
-                    Text("0\nSeguidos", textAlign = TextAlign.Center)
-                }
-            }
+            // COMENTARIO.
+            Text("0\nSeguidos", textAlign = TextAlign.Center)
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // COMENTARIO.
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp)
+        ) {
+            Text("[placeholder]")
+        }
+        Spacer(modifier = Modifier.height(10.dp))
 
         // COMENTARIO. TODO: Esto deberia estar en la cuenta de otros usuarios, no la propia.
         Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp)
         ) {
-            Button( // TODO: Funcionalidad del botón.
-                onClick = { appViewModel.restartBoolean() },
+            Button(
+                onClick = { /* TODO: Funcionalidad del botón. */ },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Seguir")
@@ -136,19 +145,43 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
             modifier = Modifier.fillMaxWidth()
         ) {
             // COMENTARIO.
-            Text("Mis recetas")
+            Button(
+                onClick = { /* TODO: Funcionalidad del botón. */ },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.Black
+                )
+            ) {
+                Text("Mis recetas")
+            }
 
             // COMENTARIO.
             Text("|")
 
             // COMENTARIO.
-            Text("Guardadas")
+            Button(
+                onClick = { /* TODO: Funcionalidad del botón. */ },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.Black
+                )
+            ) {
+                Text("Guardadas")
+            }
 
             // COMENTARIO.
             Text("|")
 
             // COMENTARIO.
-            Text("¿ALGO?")
+            Button(
+                onClick = { /* TODO: Funcionalidad del botón. */ },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.Black
+                )
+            ) {
+                Text("¿ALGO?")
+            }
         }
     }
 }

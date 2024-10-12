@@ -1,5 +1,8 @@
 package com.example.chefhub.ui
 
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+
 data class AppUiState(
     /** Variables LoginScreen **/
     val email: String = "",
@@ -14,10 +17,13 @@ data class AppUiState(
     /** Variables PasswordRecoveryScreen **/
     val recoveryEmail: String = "",
 
-    /** -variables AddRecipe **/
+    /** Variables AddRecipeScreen **/
     val recipeTitle: String = "",
     val ingredientList: MutableList<String> = arrayListOf(""),
     val instructionsList: MutableList<String> = arrayListOf(""),
+
+    /** Variables AccountScreen **/
+    val drawerState: DrawerState = DrawerState(initialValue = DrawerValue.Closed),
 
 
     /** Variables generales **/
