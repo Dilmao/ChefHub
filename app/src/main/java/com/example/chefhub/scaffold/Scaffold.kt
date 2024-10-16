@@ -11,9 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,11 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,18 +28,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.chefhub.navigation.AppScreens
-import com.example.chefhub.ui.AppViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyAccountTopAppBar(// TODO: Cambiar los colores, mejorar los comentarios.
     titulo: String,                 // COMENTARIO.
-    appViewModel: AppViewModel      // COMENTARIO.
+    navController: NavController      // COMENTARIO.
 ) {
-    // COMENTARIO.
-    val scope = rememberCoroutineScope()
-
     // COMENTARIO.
     TopAppBar(
         title = { Text(text = titulo) },
@@ -54,12 +44,8 @@ fun MyAccountTopAppBar(// TODO: Cambiar los colores, mejorar los comentarios.
             actionIconContentColor = MaterialTheme.colorScheme.primary
             ),
         actions = {
-            IconButton(onClick = {
-                scope.launch {
-                    appViewModel.onChangeDrawerState()
-                }
-            }) {
-                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
+            IconButton(onClick = { navController.navigate(AppScreens.SettingsScreen.route) }) {
+                Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
             }
         }
     )

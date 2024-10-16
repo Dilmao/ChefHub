@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,39 +36,18 @@ import com.example.chefhub.ui.AppViewModel
 
 @Composable
 fun AccountScreen(navController: NavController, appViewModel: AppViewModel) {
-    // COMENTARIO.
-    val appUiState by appViewModel.appUiState.collectAsState()
-
-    // COMENTARIO.
-    ModalNavigationDrawer(
-        drawerState = appUiState.drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                Column(
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.size(250.dp)
-                ) {
-                    // COMENTARIO.
-                    Text("Item 1")
-                    Text("Item 2")
-                }
-            }
-        }
-    ) {
-        Scaffold(
-            topBar = { MyAccountTopAppBar("[placeholder]", appViewModel) },
-            bottomBar = { MyMainBottomBar("Account", navController) }
-        ) { paddingValues ->
+    Scaffold(
+        topBar = { MyAccountTopAppBar("[placeholder]", navController) },
+        bottomBar = { MyMainBottomBar("Account", navController) }
+    ) { paddingValues ->
+        // COMENTARIO.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
             // COMENTARIO.
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                // COMENTARIO.
-                AccountScreenContent(navController, appViewModel)
-            }
+            AccountScreenContent(navController, appViewModel)
         }
     }
 }
