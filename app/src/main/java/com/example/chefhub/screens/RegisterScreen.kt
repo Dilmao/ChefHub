@@ -1,5 +1,7 @@
 package com.example.chefhub.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.chefhub.data.DataUser
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.screens.components.ClickableText
 import com.example.chefhub.screens.components.PasswordTextField
@@ -43,20 +46,21 @@ fun RegisterScreen(navController: NavHostController, appViewModel: AppViewModel)
 
 @Composable
 fun RegisterScreenBodyContent(navController: NavHostController, appViewModel: AppViewModel) {
-    // Se obtiene el estado actual de la UI desde el ViewModel.
+    // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
-    // Contexto actual de la aplicación.
     val context = LocalContext.current
 
     // Estructura en columna para alinear los elementos.
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize().padding(20.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
     ) {
         // Campo de texto para ingresar el nuevo nombre de usuario.
         SimpleTextField(
-            value = appUiState.newUsuario,
+            value = appUiState.newUser,
             onValueChange = { appViewModel.onRegisterChanged(it, "user") },
             label = "Usuario",
             required = true
@@ -84,7 +88,7 @@ fun RegisterScreenBodyContent(navController: NavHostController, appViewModel: Ap
         // Campo de texto para confirmar la nueva contraseña.
         PasswordTextField(
             value = appUiState.confirmNewPassword,
-            onValueChange = { appViewModel.onRegisterChanged(it, "confirmPasswor") },
+            onValueChange = { appViewModel.onRegisterChanged(it, "confirmPassword") },
             label = "Confirmar contraseña",
             required = true
         )
@@ -94,8 +98,9 @@ fun RegisterScreenBodyContent(navController: NavHostController, appViewModel: Ap
         SimpleButton(
             texto = "Registrarse",
             onClick = { appViewModel.checkRegister(context) { registerSuccesful ->
-                // Si el registro es exitoso, se navega a la pantalla de inicio.
-                if (registerSuccesful) navController.navigate(AppScreens.MainScreen.route)
+                if (registerSuccesful) {
+                    navController.navigate(AppScreens.MainScreen.route)
+                }
             } },
         )
         Spacer(modifier = Modifier.height(20.dp))

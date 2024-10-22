@@ -2,14 +2,22 @@ package com.example.chefhub.ui
 
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import com.example.chefhub.data.SettingOption
+import com.example.chefhub.data.settingOptions
 
 data class AppUiState(
+    /** Variables generales **/
+    val messageText: String = "",
+    val showMessage: Boolean = false,
+    val userId: Long = 0,
+
+
     /** Variables LoginScreen **/
     val email: String = "",
     val password: String = "",
 
     /** Variables RegisterScreen **/
-    val newUsuario: String = "",
+    val newUser: String = "",
     val newEmail: String = "",
     val newPassword: String = "",
     val confirmNewPassword: String = "",
@@ -25,8 +33,6 @@ data class AppUiState(
     /** Variables AccountScreen **/
     val drawerState: DrawerState = DrawerState(initialValue = DrawerValue.Closed),
 
-
-    /** Variables generales **/
-    val messageText: String = "",
-    val showMessage: Boolean = false,
+    /** Variables SettingsScreen **/
+    val settingsOptions: List<SettingOption> = settingOptions,
 )

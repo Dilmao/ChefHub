@@ -3,6 +3,8 @@ package com.example.chefhub.ui
 import android.content.Context
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import com.example.chefhub.data.DataUser
+import com.example.chefhub.data.SettingOption
 import com.example.chefhub.screens.components.saveCredentials
 import com.example.chefhub.screens.components.showMessage
 import com.google.firebase.Firebase
@@ -44,6 +46,8 @@ class AppViewModel {
         // Se obtiene el correo electrónico y la contraseña del estado actual de la UI.
         val email = appUiState.value.email
         val password = appUiState.value.password
+        val dataUser = DataUser(context = context)
+        var userId: Long
 
         // Se inicializa la instancia de FirebaseAuth para manejar la autenticación.
         val auth: FirebaseAuth = Firebase.auth
@@ -52,7 +56,18 @@ class AppViewModel {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             // Si el inicio de sesión es exitoso, muestra un mensaje de éxito.
             if (task.isSuccessful) {
+                // COMENTARIO.
                 saveCredentials(context, email, password)
+
+                // COMENTARIO.
+                userId = dataUser.loginUser(email, password)
+
+                // COMENTARIO.
+                _appUiState.update { currentState ->
+                    currentState.copy(userId = userId)
+                }
+
+                // COMENTARIO.
                 showMessage(context = context, mensaje = "Inicio de sesión exitoso.")
             } else {
                 // Si falla, muestra un mensaje indicando que el correo o la contraseña son incorrectos.
@@ -73,7 +88,7 @@ class AppViewModel {
 
         // Se actualiza el estado dependiendo del campo que se este modificando.
         val updatedState = when (valueName) {
-            "user" -> currentState.copy(newUsuario = newValue)
+            "user" -> currentState.copy(newUser = newValue)
             "email" -> currentState.copy(newEmail = newValue)
             "password" -> currentState.copy(newPassword = newValue)
             "confirmPassword" -> currentState.copy(confirmNewPassword = newValue)
@@ -93,9 +108,11 @@ class AppViewModel {
         callback: (Boolean) -> Unit
     ) {
         // Se obtiene el nuevo usuario, correo electrónico y contraseña desde el estado de la UI.
-        val newUsuario = appUiState.value.newUsuario
+        val newUsuario = appUiState.value.newUser
         val newEmail = appUiState.value.newEmail
         val newPassword = appUiState.value.newPassword
+        val dataUser = DataUser(context = context)
+        var newUserID: Long
 
         // Se inicializa FirebaseAuth para crear una nueva cuenta.
         val auth: FirebaseAuth = Firebase.auth
@@ -103,32 +120,15 @@ class AppViewModel {
         // Se intenta crear una nueva cuenta de usuario en Firebase con el correo y la conteaseña proporcionados.
         auth.createUserWithEmailAndPassword(newEmail, newPassword).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // Si el registro es exitoso, muestra un mensaje de éxito.
-                showMessage(context = context, mensaje = "Cuenta creada exitosamente.")
+                // Si el registro es exitoso, se guarda el nuevo usuario.
+                newUserID = dataUser.registerUser(newUsuario, newEmail, newPassword)
 
-                // TODO: Almacenar la información del usuario en la base de datos (Cloud Firestore).
-//                // Se obtiene el UID del usuario recién creado.
-//                val userId = auth.currentUser?.uid
-//
-//                // Se guarda el nombre de usuario en Firestore, junto con otros datos.
-//                val user = hashMapOf(
-//                    "userId" to userId,
-//                    "username" to newUsuario,
-//                    "email" to newEmail
-//                )
-//
-//                // COMENTARIO.
-//                firestore.collection("users")
-//                    .document(userId!!)
-//                    .set(user)
-//                    .addOnSuccessListener {
-//                        // COMENTARIO.
-//                        showMessage(context = context, mensaje = "Cuenta creada exitosamente.")
-//                    }
-//                    .addOnFailureListener {
-//                        // COMENTARIO.
-//                        showMessage(context = context, mensaje = "Error al guardar el nombre de usuario.")
-//                    }
+                _appUiState.update { currentState ->
+                    currentState.copy(userId = newUserID)
+                }
+
+                // Y por ultimo se imprime un mensaje de éxito.
+                showMessage(context = context, mensaje = "Nuevo usuario creado con exito.")
             } else {
                 // Si falla el registro, muestra un mensaje indicando que el correo ya esta registrado.
                 showMessage(context = context, mensaje = "El correo electrónico ya existe en nuestra base de datos.") // TODO: Mejorar mensaje.
@@ -253,6 +253,13 @@ class AppViewModel {
         // COMENTARIO.
         _appUiState.update { currentState ->
             currentState.copy(drawerState = drawerState)
+        }
+    }
+
+    /** Funciones SettingsScreen **/
+    fun onChangeSettingsScreen(newList: List<SettingOption>) {
+        _appUiState.update { currentState ->
+            currentState.copy(settingsOptions = newList) // TODO: Arreglar
         }
     }
 }

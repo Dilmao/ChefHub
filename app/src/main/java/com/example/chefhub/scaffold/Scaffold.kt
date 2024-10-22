@@ -31,62 +31,75 @@ import com.example.chefhub.navigation.AppScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyAccountTopAppBar(// TODO: Cambiar los colores, mejorar los comentarios.
-    titulo: String,                 // COMENTARIO.
-    navController: NavController      // COMENTARIO.
+fun MyAccountTopAppBar(
+    titulo: String,
+    navController: NavController
 ) {
-    // COMENTARIO.
     TopAppBar(
-        title = { Text(text = titulo) },
+        title = { Text(text = titulo, color = Color.Black) }, // Título en negro
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.primary,
-            actionIconContentColor = MaterialTheme.colorScheme.primary
-            ),
+            containerColor = Color(0xFFF5F5F5), // Fondo gris claro
+            titleContentColor = Color.Black,
+            actionIconContentColor = Color.Black
+        ),
         actions = {
             IconButton(onClick = { navController.navigate(AppScreens.SettingsScreen.route) }) {
-                Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
+                Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings", tint = Color.Black)
             }
         }
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyMainBottomBar(// TODO: Cambiar los colores, mejorar los comentarios.
-    screen: String,                 // Página desde la que se hace la llamada.
-    navController: NavController    // COMENTARIO.
-    ) {
-    // COMENTARIO.
+fun MyGeneralTopAppBar(
+    titulo: String,
+) {
+    TopAppBar(
+        title = { Text(
+            text = titulo,
+            style = MaterialTheme.typography.headlineLarge,
+            color = Color.Black // Título en negro
+        ) },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color(0xFFF5F5F5), // Fondo gris claro
+            titleContentColor = Color.Black,
+            actionIconContentColor = Color.Black
+        )
+    )
+}
+
+@Composable
+fun MyMainBottomBar(
+    screen: String,
+    navController: NavController
+) {
     BottomAppBar(
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.primary,
+        containerColor = Color(0xFFF5F5F5), // Fondo gris claro
+        contentColor = Color.Black, // Color del contenido
         actions = {
-            // Estructura en fila para alinear los elementos.
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                // Icono personalizado para navegar a 'MainScreen'.
                 PersonalizedIconButton(
                     icon = Icons.Filled.Home,
                     contentDescription = "Home",
-                    condition = screen.equals("Main"),
+                    condition = screen == "Main",
                     onClick = { navController.navigate(AppScreens.MainScreen.route) }
                 )
 
-                // Icono personalizado para navegar a 'AddScreen'.
                 PersonalizedIconButton(
                     icon = Icons.Filled.Add,
                     contentDescription = "AddRecipe",
-                    condition = screen.equals("AddRecipe"),
+                    condition = screen == "AddRecipe",
                     onClick = { navController.navigate(AppScreens.AddRecipeScreen.route) }
                 )
 
-                // Icono personalizado para navegar a 'AccountScreen'.
                 PersonalizedIconButton(
                     icon = Icons.Filled.AccountCircle,
                     contentDescription = "Account",
-                    condition = screen.equals("Account"),
+                    condition = screen == "Account",
                     onClick = { navController.navigate(AppScreens.AccountScreen.route) }
                 )
             }
@@ -95,40 +108,33 @@ fun MyMainBottomBar(// TODO: Cambiar los colores, mejorar los comentarios.
 }
 
 @Composable
-fun PersonalizedIconButton(// TODO: Mejorar los comentarios.
-    icon: ImageVector,          // Icono que se mostrara.
-    contentDescription: String, // Descripción del icono para accesibilidad.
-    condition: Boolean,         // Condición para modificar la visibilidad del icono.
-    onClick: () -> Unit         // Acción que se ejecutara cuando el icono sea presionado.
+fun PersonalizedIconButton(
+    icon: ImageVector,
+    contentDescription: String,
+    condition: Boolean,
+    onClick: () -> Unit
 ) {
-    // Se comprueba si se cumple la condición.
     if (condition) {
-        // En caso de cumplirse, el botón no hara nada y se modifica su apariencia.
-        IconButton(
-            onClick = { onClick() },
-        ) {
+        IconButton(onClick = { onClick() }) {
             Box(
                 modifier = Modifier
                     .size(50.dp)
-                    .background(Color.Black, shape = CircleShape),
+                    .background(Color(0xFF00796B), shape = CircleShape), // Fondo verde oscuro para el botón
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = contentDescription,
-                    tint = Color.White
+                    tint = Color.White // Icono en blanco
                 )
             }
         }
     } else {
-        // En caso de no cumplirse, el botón efectua su función y no se modifica su apariencia.
-        IconButton(
-            onClick = { onClick() }
-        ) {
+        IconButton(onClick = { onClick() }) {
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                tint = Color.Black
+                tint = Color.Black // Icono en negro
             )
         }
     }

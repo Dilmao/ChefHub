@@ -1,6 +1,0 @@
-Los cambios efectuados en el codigo referentes a firestore estan acutalmente en:
-- build.gradle.kts(Module :app)
-- AndroidManifest.xml
-
-Todos los cambios referentes a firestore estan comentados en la parte superior
-avisando que son para firestore, en caso de dejar de usarlos, quitar ese codigo.

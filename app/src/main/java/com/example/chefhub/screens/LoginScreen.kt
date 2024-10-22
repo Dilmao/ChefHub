@@ -44,13 +44,11 @@ fun LoginScreen(navController: NavHostController, appViewModel: AppViewModel) {
 
 @Composable
 fun LoginScreenBodyContent(navController: NavHostController, appViewModel: AppViewModel) {
-    // Se obtiene el estado actual de la UI desde el ViewModel.
+    // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
-    // Contexto actual de la aplicación.
     val context = LocalContext.current
 
-    /** FUNCIONES PRUEBA: GUARDAR DATOS DE INICIO DE SESION **/
-    // Se intenta cargar las credenciales guardadas
+    // Se intentan cargar las credenciales guardadas. TODO: No se puede borrar el correo/contraseña guardados
     val (savedEmail, savedPassword) = loadCredentials(context)
     if (savedEmail != null && savedPassword != null) {
         appViewModel.onLoginChanged(savedEmail, savedPassword)
@@ -85,10 +83,11 @@ fun LoginScreenBodyContent(navController: NavHostController, appViewModel: AppVi
         // Botón para iniciar sesión.
         SimpleButton(
             texto = "Iniciar sesión",
-            onClick = { appViewModel.checkLogin(context) { loginSuccessful ->
-                // Si el inicio de sesión es exitoso, se navega a la pantalla de inicio.
+            onClick = {
+                appViewModel.checkLogin(context) { loginSuccessful ->
                 if (loginSuccessful) navController.navigate(AppScreens.MainScreen.route)
-            } },
+            }
+                      },
         )
         Spacer(modifier = Modifier.height(20.dp))
 
