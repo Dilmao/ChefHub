@@ -1,9 +1,11 @@
 package com.example.chefhub.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.chefhub.db.ChefhubDB
 import com.example.chefhub.screens.AccountScreen
 import com.example.chefhub.screens.AddRecipeScreen
 import com.example.chefhub.screens.LoginScreen
@@ -15,8 +17,9 @@ import com.example.chefhub.ui.AppViewModel
 
 @Composable
 fun AppNavigation() {
+    val context = LocalContext.current
     val navController = rememberNavController()
-    val appViewModel = AppViewModel()
+    val appViewModel = AppViewModel(context)
 
     NavHost(navController = navController, startDestination = AppScreens.LoginScreen.route) {
         composable(route = AppScreens.LoginScreen.route) { LoginScreen(navController, appViewModel) }

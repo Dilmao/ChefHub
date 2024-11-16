@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.chefhub.data.DataUser
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.screens.components.ClickableText
 import com.example.chefhub.screens.components.PasswordTextField
@@ -60,7 +59,7 @@ fun RegisterScreenBodyContent(navController: NavHostController, appViewModel: Ap
     ) {
         // Campo de texto para ingresar el nuevo nombre de usuario.
         SimpleTextField(
-            value = appUiState.newUser,
+            value = appUiState.user,
             onValueChange = { appViewModel.onRegisterChanged(it, "user") },
             label = "Usuario",
             required = true
@@ -69,7 +68,7 @@ fun RegisterScreenBodyContent(navController: NavHostController, appViewModel: Ap
 
         // Campo de texto para ingresar el nuevo correo electrónico.
         SimpleTextField(
-            value = appUiState.newEmail,
+            value = appUiState.email,
             onValueChange = { appViewModel.onRegisterChanged(it, "email") },
             label = "Correo electrónico",
             required = true
@@ -78,7 +77,7 @@ fun RegisterScreenBodyContent(navController: NavHostController, appViewModel: Ap
 
         // Campo de texto para ingresar la nueva contraseña.
         PasswordTextField(
-            value = appUiState.newPassword,
+            value = appUiState.password,
             onValueChange = { appViewModel.onRegisterChanged(it, "password") },
             label = "Contraseña",
             required = true
@@ -87,7 +86,7 @@ fun RegisterScreenBodyContent(navController: NavHostController, appViewModel: Ap
 
         // Campo de texto para confirmar la nueva contraseña.
         PasswordTextField(
-            value = appUiState.confirmNewPassword,
+            value = appUiState.confirmPassword,
             onValueChange = { appViewModel.onRegisterChanged(it, "confirmPassword") },
             label = "Confirmar contraseña",
             required = true
@@ -106,6 +105,13 @@ fun RegisterScreenBodyContent(navController: NavHostController, appViewModel: Ap
         Spacer(modifier = Modifier.height(20.dp))
 
         // Texto clicable para iniciar sesión.
-        ClickableText(mensaje = "¿Ya tienes una cuenta? ", enlace = "Iniciar sesión", ruta = AppScreens.LoginScreen.route, navController = navController)
+        ClickableText(
+            mensaje = "¿Ya tienes una cuenta? ",
+            enlace = "Iniciar sesión",
+            onClick = {
+                appViewModel.resetUserValues()
+                navController.navigate(AppScreens.LoginScreen.route)
+            }
+        )
     }
 }

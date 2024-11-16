@@ -3,8 +3,8 @@ package com.example.chefhub.ui
 import android.content.Context
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
-import com.example.chefhub.data.DataUser
-import com.example.chefhub.data.SettingOption
+import com.example.chefhub.db.ChefhubDB
+import com.example.chefhub.db.SettingOption
 import com.example.chefhub.screens.components.saveCredentials
 import com.example.chefhub.screens.components.showMessage
 import com.google.firebase.Firebase
@@ -16,15 +16,28 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class AppViewModel {
+class AppViewModel(context: Context) {
+    private val database: ChefhubDB = ChefhubDB.getDatabase(context)
     private val _appUiState = MutableStateFlow(AppUiState())
     val appUiState: StateFlow<AppUiState> = _appUiState.asStateFlow()
 
-    /** Reiniciar variables **/
+    /** Funciones generales **/
     fun restartBoolean() {
         // Se reinician las variables de tipo boolean.
         _appUiState.update { currentState ->
             currentState.copy(showMessage = false)
+        }
+    }
+
+    fun resetUserValues() {
+        // COMENTARIO.
+        _appUiState.update { currentState ->
+            currentState.copy(
+                user = "",
+                email = "",
+                password = "",
+                confirmPassword = "",
+            )
         }
     }
 
@@ -39,14 +52,14 @@ class AppViewModel {
         }
     }
 
-    fun checkLogin (
+    fun checkLogin(
         context: Context,
         callback: (Boolean) -> Unit
     ) {
         // Se obtiene el correo electrónico y la contraseña del estado actual de la UI.
         val email = appUiState.value.email
         val password = appUiState.value.password
-        val dataUser = DataUser(context = context)
+//        val dataUser = TODO
         var userId: Long
 
         // Se inicializa la instancia de FirebaseAuth para manejar la autenticación.
@@ -60,18 +73,16 @@ class AppViewModel {
                 saveCredentials(context, email, password)
 
                 // COMENTARIO.
-                userId = dataUser.loginUser(email, password)
-
-                // COMENTARIO.
-                _appUiState.update { currentState ->
-                    currentState.copy(userId = userId)
-                }
+                // TODO
 
                 // COMENTARIO.
                 showMessage(context = context, mensaje = "Inicio de sesión exitoso.")
             } else {
                 // Si falla, muestra un mensaje indicando que el correo o la contraseña son incorrectos.
-                showMessage(context = context, mensaje = "El correo electrónico o la contraseña son incorrectos.")
+                showMessage(
+                    context = context,
+                    mensaje = "El correo electrónico o la contraseña son incorrectos."
+                )
             }
             // Lama al callback con el resultado del inicio de sesión
             callback(task.isSuccessful)
@@ -88,10 +99,10 @@ class AppViewModel {
 
         // Se actualiza el estado dependiendo del campo que se este modificando.
         val updatedState = when (valueName) {
-            "user" -> currentState.copy(newUser = newValue)
-            "email" -> currentState.copy(newEmail = newValue)
-            "password" -> currentState.copy(newPassword = newValue)
-            "confirmPassword" -> currentState.copy(confirmNewPassword = newValue)
+            "user" -> currentState.copy(user = newValue)
+            "email" -> currentState.copy(email = newValue)
+            "password" -> currentState.copy(password = newValue)
+            "confirmPassword" -> currentState.copy(confirmPassword = newValue)
             // En caso de que el valor modificado no este entre las opciones, se muestra un mensaje de error inesperado
             else -> currentState.copy(
                 messageText = "Error inesperado en RegisterScreen ($valueName)",
@@ -108,10 +119,10 @@ class AppViewModel {
         callback: (Boolean) -> Unit
     ) {
         // Se obtiene el nuevo usuario, correo electrónico y contraseña desde el estado de la UI.
-        val newUsuario = appUiState.value.newUser
-        val newEmail = appUiState.value.newEmail
-        val newPassword = appUiState.value.newPassword
-        val dataUser = DataUser(context = context)
+        val newUsuario = appUiState.value.user
+        val newEmail = appUiState.value.email
+        val newPassword = appUiState.value.password
+//        val dataUser = TODO
         var newUserID: Long
 
         // Se inicializa FirebaseAuth para crear una nueva cuenta.
@@ -121,17 +132,16 @@ class AppViewModel {
         auth.createUserWithEmailAndPassword(newEmail, newPassword).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 // Si el registro es exitoso, se guarda el nuevo usuario.
-                newUserID = dataUser.registerUser(newUsuario, newEmail, newPassword)
-
-                _appUiState.update { currentState ->
-                    currentState.copy(userId = newUserID)
-                }
+                // TODO
 
                 // Y por ultimo se imprime un mensaje de éxito.
                 showMessage(context = context, mensaje = "Nuevo usuario creado con exito.")
             } else {
                 // Si falla el registro, muestra un mensaje indicando que el correo ya esta registrado.
-                showMessage(context = context, mensaje = "El correo electrónico ya existe en nuestra base de datos.") // TODO: Mejorar mensaje.
+                showMessage(
+                    context = context,
+                    mensaje = "El correo electrónico ya existe en nuestra base de datos."
+                ) // TODO: Mejorar mensaje.
             }
             // Devuelve el resultado del registro.
             callback(task.isSuccessful)
@@ -144,7 +154,7 @@ class AppViewModel {
     ) {
         // Se actualiza el estado de la página PasswordRecoveryScreen.
         _appUiState.update { currentState ->
-            currentState.copy(recoveryEmail = recoveryEmail)
+            currentState.copy(email = recoveryEmail)
         }
     }
 
@@ -160,7 +170,8 @@ class AppViewModel {
             .addOnCompleteListener { task ->
                 // Si el envio del correo fue exitoso, se muestra un mensaje de éxito.
                 if (task.isSuccessful) {
-                    errorMessage = "Se ha enviado un correo electrónico a la dirección: \"${appUiState.value.recoveryEmail}\".\n Siga las instrucciones en el correo para cambiar la contraseña."
+                    errorMessage =
+                        "Se ha enviado un correo electrónico a la dirección: \"${appUiState.value.email}\".\n Siga las instrucciones en el correo para cambiar la contraseña."
                 } else {
                     // Si la tarea falla, se verifica la excepción que provocó el fallo. TODO: No se cuando entra en este caso :v
                     errorMessage = when (val exception = task.exception) {
@@ -173,7 +184,9 @@ class AppViewModel {
                                 // En caso de otro error de FirebaseAuth.
                                 "Se ha producido un error. Por favor, inténtalo de nuevo."
                             }
-                        } else -> {
+                        }
+
+                        else -> {
                             // Si es otro tipo de error no especificado.
                             "Error desconocido. Por favor, intenta más tarde."
                         }

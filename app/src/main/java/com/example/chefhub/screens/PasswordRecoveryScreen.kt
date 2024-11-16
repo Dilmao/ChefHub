@@ -62,7 +62,7 @@ fun PasswordRecoveryScreenBodyContent(navController: NavHostController, appViewM
 
         // Campo de texto para ingresar el correo electrónico.
         SimpleTextField(
-            value = appUiState.recoveryEmail,
+            value = appUiState.email,
             onValueChange = { appViewModel.onRecoveryChanged(it) },
             label = "Correo electrónico",
             required = true
@@ -72,12 +72,19 @@ fun PasswordRecoveryScreenBodyContent(navController: NavHostController, appViewM
         // Botón para el restablecimiento de contraseña.
         SimpleButton(
             texto = "Reestablecer contraseña",
-            onClick = { appViewModel.recoverPassword(appUiState.recoveryEmail) }
+            onClick = { appViewModel.recoverPassword(appUiState.email) }
         )
         Spacer(modifier = Modifier.height(20.dp))
 
         // Texto clicable para volver volver al inicio de sesión.
-        ClickableText(mensaje = "Volver al ", enlace = "Inicio de sesión", ruta = AppScreens.LoginScreen.route, navController = navController)
+        ClickableText(
+            mensaje = "Volver al ",
+            enlace = "Inicio de sesión",
+            onClick = {
+                appViewModel.resetUserValues()
+                navController.navigate(AppScreens.LoginScreen.route)
+            }
+        )
     }
 
     // De ser necesario, se mostrara un mensaje de alerta.

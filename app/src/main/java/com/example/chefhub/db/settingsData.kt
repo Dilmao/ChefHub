@@ -1,4 +1,4 @@
-package com.example.chefhub.data
+package com.example.chefhub.db
 
 import com.example.chefhub.ui.AppViewModel
 

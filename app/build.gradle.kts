@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    //Room
+    id("kotlin-kapt")
     // Firebase
     id("com.google.gms.google-services")
 }
@@ -63,6 +65,12 @@ dependencies {
     implementation(libs.androidx.material3)
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.5")
+
+    // Room
+    val roomVersion = "2.6.1"
+    implementation ("androidx.room:room-runtime:${roomVersion}")
+    implementation("androidx.room:room-ktx:${roomVersion}")
+    kapt("androidx.room:room-compiler:${roomVersion}")
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))

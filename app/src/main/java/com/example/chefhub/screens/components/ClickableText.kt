@@ -18,8 +18,7 @@ import androidx.navigation.NavController
 fun ClickableText(
     mensaje: String,                // Texto estático que precede al enlace.
     enlace: String,                 // Texto del enlace que se puede hacer clic.
-    ruta: String,                   // Ruta de navegación a la que se debe dirigir al hacer clic en el enlace.
-    navController: NavController,   // Controlador de navegación para cambiar de pantalla.
+    onClick: () -> Unit,            // COMENTARIO.
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -32,7 +31,7 @@ fun ClickableText(
         // Muestra el texto del enlace que puede ser clicado con su estilo.
         ClickableText(
             text = AnnotatedString(enlace),
-            onClick = { navController.navigate(ruta) },
+            onClick = { onClick() },
             style = TextStyle(
                 color = Color.Blue,
                 textDecoration = TextDecoration.Underline

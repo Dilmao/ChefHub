@@ -11,6 +11,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -47,11 +50,15 @@ fun LoginScreenBodyContent(navController: NavHostController, appViewModel: AppVi
     // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
+    var loadedCredentials by rememberSaveable { mutableStateOf(false) }
 
-    // Se intentan cargar las credenciales guardadas. TODO: No se puede borrar el correo/contraseña guardados
-    val (savedEmail, savedPassword) = loadCredentials(context)
-    if (savedEmail != null && savedPassword != null) {
-        appViewModel.onLoginChanged(savedEmail, savedPassword)
+    // Se intentan cargar las credenciales guardadas.
+    if (!loadedCredentials) {
+        val (savedEmail, savedPassword) = loadCredentials(context)
+        if (savedEmail != null && savedPassword != null) {
+            appViewModel.onLoginChanged(savedEmail, savedPassword)
+            loadedCredentials = true
+        }
     }
 
     // Estructura en columna para alinear los elementos.
@@ -85,14 +92,31 @@ fun LoginScreenBodyContent(navController: NavHostController, appViewModel: AppVi
             texto = "Iniciar sesión",
             onClick = {
                 appViewModel.checkLogin(context) { loginSuccessful ->
-                if (loginSuccessful) navController.navigate(AppScreens.MainScreen.route)
+                if (loginSuccessful) {
+                    appViewModel.resetUserValues()
+                    navController.navigate(AppScreens.MainScreen.route)
+                }
             }
                       },
         )
         Spacer(modifier = Modifier.height(20.dp))
 
         // Textos clicables para registrarse o recuperar la contraseña.
-        ClickableText(mensaje = "¿No tienes una cuenta? ", enlace = "Registrarse", ruta = AppScreens.RegisterScreen.route, navController = navController)
-        ClickableText(mensaje = "¿Has olvidado tu contraseña?  ", enlace = "Ayuda", ruta = AppScreens.PasswordRecoveryScreen.route, navController = navController)
+        ClickableText(
+            mensaje = "¿No tienes una cuenta? ",
+            enlace = "Registrarse",
+            onClick = {
+                appViewModel.resetUserValues()
+                navController.navigate(AppScreens.RegisterScreen.route)
+            }
+        )
+        ClickableText(
+            mensaje = "¿Has olvidado tu contraseña?  ",
+            enlace = "Ayuda",
+            onClick = {
+                appViewModel.resetUserValues()
+                navController.navigate(AppScreens.PasswordRecoveryScreen.route)
+            }
+        )
     }
 }
