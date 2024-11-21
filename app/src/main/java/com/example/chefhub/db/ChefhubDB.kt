@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.chefhub.db.dao.*
 import com.example.chefhub.db.data.*
 
@@ -13,23 +14,20 @@ import com.example.chefhub.db.data.*
         Recipes::class,
         Categories::class,
         RecipeCategories::class,
-        Tags::class,
-        RecipeTags::class,
         Comments::class,
         Ratings::class,
         Favorites::class,
         Follows::class
     ],
-    version = 1,
+    version = 3,
     exportSchema = true
 )
+@TypeConverters(Converters::class)
 abstract class ChefhubDB: RoomDatabase() {
     abstract val usersDao: UsersDao
     abstract val recipesDao: RecipesDao
     abstract val categoriesDao: CategoriesDao
     abstract val recipeCategoriesDao: RecipeCategoriesDao
-    abstract val tagsDao: TagsDao
-    abstract val recipeTagsDao: RecipeTagsDao
     abstract val commentsDao: CommentsDao
     abstract val ratingsDao: RatingsDao
     abstract val favoritesDao: FavoritesDao
@@ -45,7 +43,9 @@ abstract class ChefhubDB: RoomDatabase() {
                     context.applicationContext,
                     ChefhubDB::class.java,
                     "chefhub_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

@@ -62,7 +62,7 @@ fun PasswordRecoveryScreenBodyContent(navController: NavHostController, appViewM
 
         // Campo de texto para ingresar el correo electrónico.
         SimpleTextField(
-            value = appUiState.email,
+            value = appUiState.user.email,
             onValueChange = { appViewModel.onRecoveryChanged(it) },
             label = "Correo electrónico",
             required = true
@@ -72,7 +72,7 @@ fun PasswordRecoveryScreenBodyContent(navController: NavHostController, appViewM
         // Botón para el restablecimiento de contraseña.
         SimpleButton(
             texto = "Reestablecer contraseña",
-            onClick = { appViewModel.recoverPassword(appUiState.email) }
+            onClick = { appViewModel.recoverPassword(appUiState.user.email) }
         )
         Spacer(modifier = Modifier.height(20.dp))
 

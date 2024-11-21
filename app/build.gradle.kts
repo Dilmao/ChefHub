@@ -72,6 +72,9 @@ dependencies {
     implementation("androidx.room:room-ktx:${roomVersion}")
     kapt("androidx.room:room-compiler:${roomVersion}")
 
+    // Gson
+    implementation("com.google.code.gson:gson:2.8.8")
+
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
     implementation("com.google.firebase:firebase-firestore")

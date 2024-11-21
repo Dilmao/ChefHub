@@ -4,6 +4,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.Index
+import androidx.room.TypeConverters
+import com.example.chefhub.db.Converters
 
 @Entity(
     tableName = "recipes",
@@ -19,11 +21,11 @@ import androidx.room.Index
 )
 data class Recipes(
     @PrimaryKey(autoGenerate = true) val recipeId: Int = 0, // PK, AUTO_INCREMENT
-    val userId: Int,
-    val title: String,
+    val userId: Int = -1,
+    val title: String = "",
     val description: String? = null,
-    val ingredientList: String,
-    val instructions: String,
+    @TypeConverters(Converters::class) val ingredients: ArrayList<String> = arrayListOf(""),
+    @TypeConverters(Converters::class) val instructions: ArrayList<String> = arrayListOf(""),
     val imageUrl: String? = null,
     val prepTime: Int? = null,
     val cookTime: Int? = null,

@@ -23,6 +23,22 @@ fun SimpleButton(
 }
 
 @Composable
+fun InvisibleButton(
+    texto: String,          // Texto que se motrara en el botón.
+    onClick: () -> Unit,    // Acción que se ejecutará cuando el botón sea presionado.
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            contentColor = Color.Black
+        )
+    ) {
+        Text(text = texto)
+    }
+}
+
+@Composable
 fun SettingButton( // TODO: Modificar diseño del botón
     title: String,          // Texto que se motrara en el botón.
     onClick: () -> Unit,    // Acción que se ejecutará cuando el botón sea presionado.

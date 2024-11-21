@@ -1,6 +1,7 @@
 package com.example.chefhub.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -19,6 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,12 +37,18 @@ import androidx.navigation.NavController
 import com.example.chefhub.R
 import com.example.chefhub.scaffold.MyAccountTopAppBar
 import com.example.chefhub.scaffold.MyMainBottomBar
+import com.example.chefhub.screens.components.InvisibleButton
+import com.example.chefhub.screens.components.SimpleButton
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
 fun AccountScreen(navController: NavController, appViewModel: AppViewModel) {
+    // COMENTARIO.
+    val appUiState by appViewModel.appUiState.collectAsState()
+
+    // COMENTARIO.
     Scaffold(
-        topBar = { MyAccountTopAppBar("[placeholder]", navController) },
+        topBar = { MyAccountTopAppBar(appUiState.user.userName, navController) },
         bottomBar = { MyMainBottomBar("Account", navController) }
     ) { paddingValues ->
         // COMENTARIO.
@@ -100,7 +111,7 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
                 .fillMaxWidth()
                 .padding(start = 20.dp)
         ) {
-            Text("[placeholder]")
+            Text(appUiState.user.userName)
         }
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -128,42 +139,41 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
             modifier = Modifier.fillMaxWidth()
         ) {
             // COMENTARIO.
-            Button(
-                onClick = { /* TODO: Funcionalidad del botón. */ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color.Black
-                )
-            ) {
-                Text("Mis recetas")
-            }
+            InvisibleButton(
+                texto = "Mis recetas",
+                onClick = { appViewModel.onChangeView("recipes") }
+            )
 
             // COMENTARIO.
             Text("|")
 
             // COMENTARIO.
-            Button(
-                onClick = { /* TODO: Funcionalidad del botón. */ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color.Black
-                )
-            ) {
-                Text("Guardadas")
-            }
+            InvisibleButton(
+                texto = "Guardadas",
+                onClick = { appViewModel.onChangeView("saved") }
+            )
 
             // COMENTARIO.
             Text("|")
 
             // COMENTARIO.
-            Button(
-                onClick = { /* TODO: Funcionalidad del botón. */ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color.Black
-                )
-            ) {
-                Text("¿ALGO?")
+            InvisibleButton(
+                texto = "¿ALGO?",
+                onClick = { appViewModel.onChangeView("something") }
+            )
+        }
+
+        // COMENTARIO.
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.LightGray)
+                .padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(appUiState.recipes.size) { index ->
+                // TODO: Tarjetas.
+                Text(appUiState.recipes[index].title)
             }
         }
     }

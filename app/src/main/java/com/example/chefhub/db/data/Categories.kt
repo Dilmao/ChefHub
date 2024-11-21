@@ -10,5 +10,5 @@ import androidx.room.Index
 )
 data class Categories(
     @PrimaryKey(autoGenerate = true) val categoryId: Int = 0,   // PK, AUTO_INCREMENT
-    val categoryName: String,
+    val categoryName: String = "",
 )

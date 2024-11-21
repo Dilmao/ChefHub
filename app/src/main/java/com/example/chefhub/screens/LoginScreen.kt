@@ -71,8 +71,8 @@ fun LoginScreenBodyContent(navController: NavHostController, appViewModel: AppVi
     ) {
         // Campo de texto para ingresas el correo electrónico del usuario.
         SimpleTextField(
-            value = appUiState.email,
-            onValueChange = { appViewModel.onLoginChanged(it, appUiState.password) },
+            value = appUiState.user.email,
+            onValueChange = { appViewModel.onLoginChanged(it, appUiState.user.password) },
             label = "Correo electrónico",
             required = true
         )
@@ -80,8 +80,8 @@ fun LoginScreenBodyContent(navController: NavHostController, appViewModel: AppVi
 
         // Campo de texto para ingresas la contraseña del usuario.
         PasswordTextField(
-            value = appUiState.password,
-            onValueChange = { appViewModel.onLoginChanged(appUiState.email, it) },
+            value = appUiState.user.password,
+            onValueChange = { appViewModel.onLoginChanged(appUiState.user.email, it) },
             label = "Contraseña",
             required = true
         )

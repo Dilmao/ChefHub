@@ -1,11 +1,13 @@
 package com.example.chefhub.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.chefhub.db.ChefhubDB
+import com.example.chefhub.db.DatabaseInitializer
 import com.example.chefhub.screens.AccountScreen
 import com.example.chefhub.screens.AddRecipeScreen
 import com.example.chefhub.screens.LoginScreen
@@ -17,10 +19,18 @@ import com.example.chefhub.ui.AppViewModel
 
 @Composable
 fun AppNavigation() {
+    // COMENTARIO.
     val context = LocalContext.current
     val navController = rememberNavController()
-    val appViewModel = AppViewModel(context)
+    val database: ChefhubDB = ChefhubDB.getDatabase(context)
+    val appViewModel = AppViewModel(database)
 
+    // Inicializar la base de datos.
+    LaunchedEffect(Unit) {
+        DatabaseInitializer.initialize(database)
+    }
+
+    // COMENTARIO.
     NavHost(navController = navController, startDestination = AppScreens.LoginScreen.route) {
         composable(route = AppScreens.LoginScreen.route) { LoginScreen(navController, appViewModel) }
         composable(route = AppScreens.RegisterScreen.route) { RegisterScreen(navController, appViewModel) }
