@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +50,7 @@ fun LoginScreenBodyContent(navController: NavHostController, appViewModel: AppVi
     // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
-    var loadedCredentials by rememberSaveable { mutableStateOf(false) }
+    var loadedCredentials by remember { mutableStateOf(false) }
 
     // Se intentan cargar las credenciales guardadas.
     if (!loadedCredentials) {

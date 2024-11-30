@@ -33,7 +33,7 @@ import com.example.chefhub.screens.components.SimpleTextField
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
-fun AddRecipeScreen(navController: NavController, appViewModel: AppViewModel) {
+fun ModifyRecipeScreen(navController: NavController, appViewModel: AppViewModel) {
     // Estructura principal de la pantalla de recetas.
     Scaffold(
         topBar = {},
@@ -46,23 +46,17 @@ fun AddRecipeScreen(navController: NavController, appViewModel: AppViewModel) {
                 .padding(paddingValues)
         ) {
             // Contenido del cuerpo de la pantalla de recetas.
-            AddRecipeScreenContent(navController, appViewModel)
+            ModifyRecipeScreenContent(navController, appViewModel)
         }
     }
 }
 
 @Composable
-fun AddRecipeScreenContent(navController: NavController, appViewModel: AppViewModel) {
+fun ModifyRecipeScreenContent(navController: NavController, appViewModel: AppViewModel) {
     // TODO: Intentar hacer más atractivo a la vista.
     // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
-    var loadedRecipes by remember { mutableStateOf(false) }
-
-    if (!loadedRecipes) {
-        appViewModel.resetRecipeValues()
-        loadedRecipes = true
-    }
 
     // Estructura en columna para alinear los elementos
     LazyColumn(
@@ -220,10 +214,10 @@ fun AddRecipeScreenContent(navController: NavController, appViewModel: AppViewMo
     ) {
         // Botón para guardar la receta.
         Button(onClick = {
-            appViewModel.onSaveRecipe(context, "create")
+            appViewModel.onSaveRecipe(context, "save")
             navController.navigate(AppScreens.AccountScreen.route)
         }) {
-            Text("Crear")
+            Text("Guardar")
         }
     }
 }

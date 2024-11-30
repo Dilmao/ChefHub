@@ -1,8 +1,6 @@
 package com.example.chefhub.ui
 
 import android.content.Context
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chefhub.db.ChefhubDB
@@ -21,12 +19,10 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -40,16 +36,6 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         // Se reinician las variables de tipo boolean.
         _appUiState.update { currentState ->
             currentState.copy(showMessage = false)
-        }
-    }
-
-    fun resetUserValues() {
-        // Se reiniciar los datos del usuario.
-        val user = Users()
-        _appUiState.update { currentState ->
-            currentState.copy(
-                user = user,
-            )
         }
     }
 
@@ -311,45 +297,68 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         }
     }
 
-    fun onSaveRecipe( // TODO: Tal vez deberia eliminar todas estas variables (menos userID y recipesRepository) inutiles.
-        context: Context,
+    fun onRecipeIntChanged(
+        newValue: Int,
+        valueName: String
     ) {
-        // Obtener datos del estado de la UI.
-        val userId = appUiState.value.user.userId
-        val recipeTitle = appUiState.value.recipe.title
-        val recipeDescription = appUiState.value.recipe.description
-        val recipeIngredients = appUiState.value.recipe.ingredients
-        val recipeInstructions = appUiState.value.recipe.instructions
-        val recipeImage = appUiState.value.recipe.imageUrl
-        val recipePrepTime = appUiState.value.recipe.prepTime
-        val recipeCookTime = appUiState.value.recipe.cookTime
-        val recipeServings = appUiState.value.recipe.servings
+        // Se obtiene el estado actual de la UI.
+        val currentState = appUiState.value
+
+        // Se actualiza el estado dependiendo del campo que se esté modificando dentro del usuario.
+        val updatedState = when (valueName) {
+            "prepHour" -> currentState.copy(prepHour = newValue)
+            "prepMin" -> currentState.copy(prepMin = newValue)
+            "cookHour" -> currentState.copy(cookHour = newValue)
+            "cookMin" -> currentState.copy(cookMin = newValue)
+            "servings" -> currentState.copy(servings = newValue)
+            else -> currentState.copy(
+                messageText = "Error inesperado en AddRecipeScreen ($valueName)",
+                showMessage = true
+            )
+        }
+
+        // Se actualiza el estado de la página RegisterScreen.
+        _appUiState.update { updatedState }
+    }
+
+    fun onSaveRecipe(
+        context: Context,
+        action: String
+    ) {
+        val uiState = appUiState.value
         val recipesRepository = RecipesRepository(database.recipesDao)
+
+        val recipe = Recipes(
+            userId = uiState.user.userId,
+            title = uiState.recipe.title,
+            description = uiState.recipe.description,
+            ingredients = uiState.recipe.ingredients,
+            instructions = uiState.recipe.instructions,
+            imageUrl = uiState.recipe.imageUrl,
+            prepTime = uiState.prepHour * 60 + uiState.prepMin,
+            cookTime = uiState.cookHour * 60 + uiState.cookMin,
+            servings = uiState.servings
+        )
 
         viewModelScope.launch {
             try {
-                // Se crea el objeto Recipe para guardarlo en la base de datos local.
-                val newRecipe = Recipes(
-                    userId = userId,
-                    title = recipeTitle,
-                    description = recipeDescription,
-                    ingredients = recipeIngredients,
-                    instructions = recipeInstructions,
-                    imageUrl = recipeImage,
-                    prepTime = recipePrepTime,
-                    cookTime = recipeCookTime,
-                    servings = recipeServings
-                )
-
-                // Se inserta la nueva receta en la base de datos local.
-                recipesRepository.insertRecipe(newRecipe)
-                showMessage(context, "Receta guardada con éxito.")
-
-                // Imprimir en consola para depuración.
-                println("New Recipe: $newRecipe")
+                when (action.lowercase()) {
+                    "create" -> {
+                        recipesRepository.insertRecipe(recipe)
+                        showMessage(context, "Receta creada con éxito.")
+                    }
+                    "save" -> {
+                        recipe.recipeId = uiState.recipe.recipeId
+                        recipesRepository.updateRecipe(recipe)
+                        showMessage(context, "Receta actualizada con éxito.")
+                    }
+                    else -> {
+                        showMessage(context, "Acción desconocida: $action.")
+                    }
+                }
             } catch (e: Exception) {
-                // Manejo de errores al guardar la receta
-                showMessage(context, "Error al guardar la receta en la base de datos local: ${e.message}")
+                val errorMsg = "Error al ${if (action == "create") "crear" else "guardar"} la receta: ${e.message}"
+                showMessage(context, errorMsg)
             }
         }
     }
@@ -389,11 +398,57 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
     }
 
 
-
     /** Funciones SettingsScreen **/
+    fun resetUserValues() {
+        // Se reiniciar los datos del usuario.
+        val user = Users()
+        _appUiState.update { currentState ->
+            currentState.copy(
+                user = user,
+            )
+        }
+    }
+
+    fun resetRecipeValues() {
+        // Se reiniciar los datos del usuario.
+        val recipe = Recipes()
+        _appUiState.update { currentState ->
+            currentState.copy(
+                recipe = recipe,
+            )
+        }
+    }
+
     fun onChangeSettingsScreen(newList: List<SettingOption>) {
         _appUiState.update { currentState ->
             currentState.copy(settingsOptions = newList) // TODO: Arreglar
+        }
+    }
+
+
+    /** Funciones Database **/
+    fun onSelectRecipe(recipe: Recipes) {
+        val prepHour = recipe.prepTime?.div(60) ?: 0
+        val prepMin = recipe.prepTime?.rem(60) ?: 0
+        val cookHour = recipe.cookTime?.div(60) ?: 0
+        val cookMin = recipe.cookTime?.rem(60) ?: 0
+        val servings = recipe.servings ?: 0
+
+        _appUiState.update { currentState ->
+            currentState.copy(
+                recipe = recipe,
+                prepHour = prepHour,
+                prepMin = prepMin,
+                cookHour = cookHour,
+                cookMin = cookMin,
+                servings = servings
+            )
+        }
+    }
+
+    fun onDeleteRecipe(recipe: Recipes) {
+        viewModelScope.launch {
+            database.recipesDao.deleteRecipe(recipes = recipe)
         }
     }
 }

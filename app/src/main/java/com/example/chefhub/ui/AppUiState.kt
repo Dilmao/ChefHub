@@ -1,7 +1,5 @@
 package com.example.chefhub.ui
 
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import com.example.chefhub.db.SettingOption
 import com.example.chefhub.db.data.Categories
 import com.example.chefhub.db.data.Recipes
@@ -19,6 +17,13 @@ data class AppUiState(
     val recipe: Recipes = Recipes(),
     val recipes: MutableList<Recipes> = arrayListOf(Recipes()),
     val categories: MutableList<Categories> = arrayListOf(Categories()),
+
+    /** TODO: Nombrar **/
+    val prepHour: Int = 0,
+    val prepMin: Int = 0,
+    val cookHour: Int = 0,
+    val cookMin: Int = 0,
+    val servings: Int = 0,
 
     /** Variables SettingsScreen **/
     val settingsOptions: List<SettingOption> = settingOptions,

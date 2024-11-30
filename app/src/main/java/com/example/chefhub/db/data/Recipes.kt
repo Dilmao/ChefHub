@@ -20,7 +20,7 @@ import com.example.chefhub.db.Converters
     ]
 )
 data class Recipes(
-    @PrimaryKey(autoGenerate = true) val recipeId: Int = 0, // PK, AUTO_INCREMENT
+    @PrimaryKey(autoGenerate = true) var recipeId: Int = 0, // PK, AUTO_INCREMENT
     val userId: Int = -1,
     val title: String = "",
     val description: String? = null,

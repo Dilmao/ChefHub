@@ -28,7 +28,7 @@ fun SimpleTextField(
     value: String,                      // Valor del campo de texto.
     onValueChange: (String) -> Unit,    // Función para actualizar el valor del campo de texto.
     label: String,                      // Etiqueta que se muestra en el campo de texto.
-    required: Boolean                   // Indica si el campo es obligatorio.
+    required: Boolean = false           // Indica si el campo es obligatorio.
 ) {
     // Campo de entrada de texto.
     OutlinedTextField(

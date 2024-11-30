@@ -6,6 +6,8 @@ sealed class AppScreens (val route: String) {
     data object PasswordRecoveryScreen: AppScreens(route = "password_recovery_screen")
     data object MainScreen: AppScreens(route = "main_screen")
     data object AddRecipeScreen: AppScreens(route = "add_recipe_screen")
+    data object ModifyRecipeScreen: AppScreens(route = "modify_recipe_screen")
+    data object RecipeScreen: AppScreens(route = "recipe_screen")
     data object AccountScreen: AppScreens(route = "account_screen")
     data object SettingsScreen: AppScreens(route = "settings_screen")
 }
