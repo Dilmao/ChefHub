@@ -1,19 +1,25 @@
 package com.example.chefhub.screens.components
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -79,9 +85,35 @@ fun PasswordTextField(
 }
 
 @Composable
+fun SearchField(
+    value: String,                      // Valor del campo de texto.
+    onValueChange: (String) -> Unit,    // Función para actualizar el valor del campo de texto.
+    onSearch: () -> Unit
+) {
+    // Campo de entrada de texto.
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = { Text("Buscar...") },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        shape = RoundedCornerShape(50.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+        trailingIcon = {
+            IconButton(onClick = onSearch) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Buscar..."
+                )
+            }
+        }
+    )
+}
+
+@Composable
 private fun Label(
     text: String,
-    required: Boolean
+    required: Boolean = false
 ) {
     // Composición de la etiqueta.
     Row {

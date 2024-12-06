@@ -14,9 +14,14 @@ data class AppUiState(
 
     /** Variables Database **/
     val user: Users = Users(),
+    val users: MutableList<Users> = arrayListOf(Users()),
     val recipe: Recipes = Recipes(),
     val recipes: MutableList<Recipes> = arrayListOf(Recipes()),
     val categories: MutableList<Categories> = arrayListOf(Categories()),
+    val favorites: MutableList<Recipes> = arrayListOf(Recipes()),
+
+    /** TODO **/
+    val search: String = "",
 
     /** TODO: Nombrar **/
     val prepHour: Int = 0,

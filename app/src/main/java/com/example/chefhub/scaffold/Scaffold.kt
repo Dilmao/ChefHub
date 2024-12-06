@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -87,6 +88,13 @@ fun MyMainBottomBar(
                     contentDescription = "Home",
                     condition = screen == "Main",
                     onClick = { navController.navigate(AppScreens.MainScreen.route) }
+                )
+
+                PersonalizedIconButton(
+                    icon = Icons.Filled.Search,
+                    contentDescription = "Search",
+                    condition = screen == "Search",
+                    onClick = { navController.navigate(AppScreens.SearchScreen.route) }
                 )
 
                 PersonalizedIconButton(

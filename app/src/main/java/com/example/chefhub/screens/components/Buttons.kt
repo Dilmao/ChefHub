@@ -47,26 +47,6 @@ fun InvisibleButton(
 }
 
 @Composable
-fun ImageButton(
-    image: Int,
-    recipe: Recipes,
-    onClick: () -> Unit,
-) {
-    IconButton(
-        onClick = { onClick() }
-    ) {
-        Image(
-            painter = painterResource(id = image),
-            contentDescription = "Receta",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RectangleShape)
-        )
-    }
-}
-
-@Composable
 fun RecipeButton(
     texto: String,          // Texto que se mostrará en el botón.
     type: String,           // Indica el tipo para determinar el color.

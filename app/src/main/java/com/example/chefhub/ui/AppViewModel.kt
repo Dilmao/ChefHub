@@ -1,10 +1,12 @@
 package com.example.chefhub.ui
 
 import android.content.Context
+import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chefhub.db.ChefhubDB
 import com.example.chefhub.db.SettingOption
+import com.example.chefhub.db.data.Favorites
 import com.example.chefhub.db.data.Recipes
 import com.example.chefhub.db.data.Users
 import com.example.chefhub.db.repository.RecipesRepository
@@ -22,6 +24,7 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -73,17 +76,20 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
 
                 // Se sincronizan los datos del usuario desde la base de datos local.
                 viewModelScope.launch {
-                    val userRepository = UsersRepository(database.usersDao)
-
                     try {
-                        val user = userRepository.getUserByEmail(email)
+                        val user = database.usersDao.getUserByEmail(email)
                         if (user != null) {
-                            // Se guarda el ID del usuario.
+                            // Recoge las recetas favoritas en una lista mutable.
+                            val favoriteRecipes = database.favoritesDao.getFavoritesForUser(user.userId).first().toMutableList()
+
+                            // Actualiza el estado de la UI.
                             _appUiState.update { currentState ->
-                                currentState.copy(user = user)
+                                currentState.copy(
+                                    user = user,
+                                    favorites = favoriteRecipes
+                                )
                             }
                         } else {
-                            // Mensaje de error en caso de que el usuario no este en la base de datos local.
                             showMessage(context, "Usuario autenticado, pero no encontrado localmente.")
                         }
                     } catch (e: Exception) {
@@ -156,6 +162,9 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
             // Registrar el usuario en Firebase.
             auth.createUserWithEmailAndPassword(newEmail, newPassword).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    // Se guardan las credenciales de manera segura.
+                    saveCredentials(context, newEmail, newPassword)
+
                     // Se crea el objeto Users para guardarlo en la base de datos local.
                     val newUser = Users(
                         userName = newUserName,
@@ -166,9 +175,16 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
                     // Se inserta el nuevo usuario en la base de datos local.
                     viewModelScope.launch {
                         try {
+                            // COMENTARIO.
+                            val favoriteRecipes = database.favoritesDao.getFavoritesForUser(newUser.userId).first().toMutableList()
+
+                            // COMENTARIO.
                             userRepository.insertUser(newUser)
                             _appUiState.update { currentState ->
-                                currentState.copy(user = newUser)
+                                currentState.copy(
+                                    user = newUser,
+                                    favorites = favoriteRecipes
+                                )
                             }
                             showMessage(context, "Nuevo usuario creado con éxito.")
                             callback(true)
@@ -244,6 +260,35 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
                     )
                 }
             }
+    }
+
+    /** Funciones Search **/
+    fun onSearchChanged(search: String) {
+        // COMENTARIO.
+        _appUiState.update {currentState ->
+            currentState.copy(search = search)
+        }
+    }
+
+    fun onSearch(searchType: String) {
+        // COMENTARIO.
+        viewModelScope.launch {
+            when(searchType.lowercase()) {
+                "users" -> {
+                    val users = database.usersDao.getUsers().firstOrNull() ?: emptyList()
+                    _appUiState.update { currentState ->
+                        currentState.copy(users = ArrayList(users.toCollection(mutableListOf())))
+                    }
+                }
+                "recipes" -> {
+                    val recipes = database.recipesDao.getRecipes().firstOrNull() ?: emptyList()
+                    _appUiState.update { currentState ->
+                        currentState.copy(recipes = ArrayList(recipes.toCollection(mutableListOf())))
+                    }
+                }
+                else -> { println("Tipo desconocido: $searchType.") }
+            }
+        }
     }
 
     /** Funciones Add Recipe **/
@@ -324,7 +369,7 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
     fun onSaveRecipe(
         context: Context,
         action: String
-    ) {
+    ) { // TODO: Asegurar que los campos obligatorios esta rellenados.
         val uiState = appUiState.value
         val recipesRepository = RecipesRepository(database.recipesDao)
 
@@ -415,6 +460,11 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         _appUiState.update { currentState ->
             currentState.copy(
                 recipe = recipe,
+                prepHour = 0,
+                prepMin = 0,
+                cookHour = 0,
+                cookMin = 0,
+                servings = 0
             )
         }
     }
@@ -449,6 +499,33 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
     fun onDeleteRecipe(recipe: Recipes) {
         viewModelScope.launch {
             database.recipesDao.deleteRecipe(recipes = recipe)
+        }
+    }
+
+    fun onChangeFavorite(recipe: Recipes, action: String, context: Context) {
+        val favorite = Favorites(
+            userId = appUiState.value.user.userId,
+            recipeId = recipe.recipeId
+        )
+
+        viewModelScope.launch {
+            when (action.lowercase()) {
+                "save" -> {
+                    database.favoritesDao.insertFavorite(favorite)
+                    showMessage(context, "Receta añadida a favoritos.")
+                }
+                "delete" -> {
+                    database.favoritesDao.deleteFavorite(favorite)
+                    showMessage(context, "Receta eliminada de favoritos.")
+                }
+                else -> {
+                    showMessage(context, "Acción desconocida: $action.")
+                }
+            }
+            val favoriteRecipes = database.favoritesDao.getFavoritesForUser(appUiState.value.user.userId).first().toMutableList()
+            _appUiState.update { currentState ->
+                currentState.copy(favorites = favoriteRecipes)
+            }
         }
     }
 }

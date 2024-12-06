@@ -1,5 +1,6 @@
 package com.example.chefhub.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,20 +17,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -37,7 +42,6 @@ import com.example.chefhub.R
 import com.example.chefhub.db.data.Recipes
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.scaffold.MyMainBottomBar
-import com.example.chefhub.screens.components.ImageButton
 import com.example.chefhub.screens.components.RecipeButton
 import com.example.chefhub.ui.AppUiState
 import com.example.chefhub.ui.AppViewModel
@@ -63,6 +67,7 @@ fun RecipeScreen(navController: NavController, appViewModel: AppViewModel) {
 @Composable
 fun RecipeScreenContent(navController: NavController, appViewModel: AppViewModel) {
     val appUiState by appViewModel.appUiState.collectAsState()
+    val context = LocalContext.current
     val recipe = appUiState.recipe
 
     LazyColumn(
@@ -76,31 +81,30 @@ fun RecipeScreenContent(navController: NavController, appViewModel: AppViewModel
         item { RecipeImageSection() }
 
         /** Sección: Título y botón para guardar **/
-        item { TitleAndSaveButton(recipe = recipe) }
-
-        /** Sección: Botón de instrucciones **/
-        item { CookButton() }
+        item { TitleAndSaveButton(recipe, appViewModel, context, appUiState) }
 
         /** Separador sombreado (TODO) **/
 
         /** Sección: Información adicional **/
-        item { RecipeDetailsSection(recipe = recipe, appUiState) }
+        item { RecipeDetailsSection(recipe, appUiState) }
 
         /** Sección: Lista de ingredientes **/
-        item { IngredientsHeader() }
+        item { HeaderItem("Ingredientes:") }
         items(recipe.ingredients.size) { index ->
-            IngredientItem(ingredient = recipe.ingredients[index])
+            ListItem(recipe.ingredients[index])
         }
-        item { Spacer(modifier = Modifier.height(20.dp)) }
+        item { Spacer(Modifier.height(20.dp)) }
+
+        item { HeaderItem("Instrucciones:") }
+        items(recipe.instructions.size) { index ->
+            ListItem(recipe.instructions[index])
+        }
+        item { Spacer(Modifier.height(20.dp)) }
 
         /** Sección: Botones de edición y eliminación **/
         if (recipe.userId == appUiState.user.userId) {
             item {
-                EditAndDeleteButtons(
-                    recipe = recipe,
-                    appViewModel = appViewModel,
-                    navController = navController
-                )
+                EditAndDeleteButtons(recipe, appViewModel, navController)
             }
         }
     }
@@ -126,7 +130,15 @@ fun RecipeImageSection() {
 }
 
 @Composable
-fun TitleAndSaveButton(recipe: Recipes) {
+fun TitleAndSaveButton(
+    recipe: Recipes,
+    appViewModel: AppViewModel,
+    context: Context,
+    appUiState: AppUiState
+) {
+    var recipeSaved by remember { mutableStateOf(appUiState.favorites.any { it.recipeId == recipe.recipeId }) }
+    var action by remember { mutableStateOf("save") }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -138,30 +150,23 @@ fun TitleAndSaveButton(recipe: Recipes) {
             fontSize = 30.sp,
         )
 
-        ImageButton(
-            image = R.drawable.save,
-            recipe = recipe,
-            onClick = { /* TODO */ }
-        )
-    }
-    Spacer(Modifier.height(20.dp))
-}
-
-@Composable
-fun CookButton() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Button(
-            onClick = { /* TODO */ },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Green,
-                contentColor = Color.Black
-            ),
-            modifier = Modifier.size(150.dp, 50.dp)
+        IconButton(
+            onClick = {
+                recipeSaved = !recipeSaved
+                action = if (recipeSaved) "save" else "delete"
+                appViewModel.onChangeFavorite(recipe, action, context)
+            }
         ) {
-            Text("Cocinar")
+            Image(
+                painter = painterResource(
+                    id = if (recipeSaved) R.drawable.saved else R.drawable.save
+                ),
+                contentDescription = if (recipeSaved) "Receta guardada" else "Guardar receta",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RectangleShape)
+            )
         }
     }
     Spacer(Modifier.height(20.dp))
@@ -226,12 +231,12 @@ fun RecipeDetailRow(
 }
 
 @Composable
-fun IngredientsHeader() {
+fun HeaderItem(header: String) {
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            "Ingredientes:",
+            header,
             fontWeight = FontWeight.Bold,
             fontSize = 30.sp
         )
@@ -240,10 +245,24 @@ fun IngredientsHeader() {
 }
 
 @Composable
-fun IngredientItem(ingredient: String) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(ingredient)
-        Spacer(Modifier.height(10.dp))
+private fun ListItem(item: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        // Icono de viñeta (bullet point)
+        Text(
+            text = "•",
+            fontSize = 25.sp,
+            modifier = Modifier.padding(end = 8.dp)
+        )
+        // Texto del ingrediente/instrucción
+        Text(
+            text = item,
+            fontSize = 16.sp
+        )
     }
 }
 

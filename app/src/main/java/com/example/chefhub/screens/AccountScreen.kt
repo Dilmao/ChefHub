@@ -183,8 +183,7 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
                     onClick = {
                         appViewModel.onSelectRecipe(appUiState.recipes[index])
                         navController.navigate(AppScreens.RecipeScreen.route)
-                    },
-                    appViewModel
+                    }
                 )
             }
         }
