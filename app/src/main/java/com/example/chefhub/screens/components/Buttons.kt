@@ -47,6 +47,27 @@ fun InvisibleButton(
 }
 
 @Composable
+fun FollowButton(
+    onClick: () -> Unit,
+    isFollowed: Boolean,
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isFollowed) Color.Gray else Color.Blue,
+            contentColor = Color.White
+        )
+    ) {
+        if (isFollowed) {
+            Text("Siguiendo")
+        } else {
+            Text("Seguir")
+        }
+    }
+}
+
+@Composable
 fun RecipeButton(
     texto: String,          // Texto que se mostrará en el botón.
     type: String,           // Indica el tipo para determinar el color.

@@ -7,29 +7,36 @@ import com.example.chefhub.db.data.Users
 import com.example.chefhub.db.settingOptions
 
 data class AppUiState(
-    /** Variables generales **/
+    /** General variables **/
     val messageText: String = "",
     val showMessage: Boolean = false,
 
 
-    /** Variables Database **/
+    /** User-related variables **/
     val user: Users = Users(),
-    val users: MutableList<Users> = arrayListOf(Users()),
-    val recipe: Recipes = Recipes(),
-    val recipes: MutableList<Recipes> = arrayListOf(Recipes()),
-    val categories: MutableList<Categories> = arrayListOf(Categories()),
-    val favorites: MutableList<Recipes> = arrayListOf(Recipes()),
+    val viewedUser: Users = Users(),
+    val users: MutableList<Users> = arrayListOf(),
+    val followers: MutableList<Users> = arrayListOf(),
+    val following: MutableList<Users> = arrayListOf(),
 
-    /** TODO **/
+    /** Recipe-related variables **/
+    val recipe: Recipes = Recipes(),
+    val recipes: MutableList<Recipes> = arrayListOf(),
+    val favorites: MutableList<Recipes> = arrayListOf(),
+
+    /** Category-related variables **/
+    val categories: MutableList<Categories> = arrayListOf(),
+
+    /** Search variables **/
     val search: String = "",
 
-    /** TODO: Nombrar **/
+    /** Recipe details **/
     val prepHour: Int = 0,
     val prepMin: Int = 0,
     val cookHour: Int = 0,
     val cookMin: Int = 0,
     val servings: Int = 0,
 
-    /** Variables SettingsScreen **/
+    /** Settings screen variables **/
     val settingsOptions: List<SettingOption> = settingOptions,
 )

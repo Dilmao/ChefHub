@@ -31,7 +31,7 @@ interface FollowsDao {
     """)
     fun getFollowersForUser(followingId: Int): Flow<List<Users>>
 
-    // Obtiene todos los usuarios seguidos por un seguidor específico
+    // Obtiene todos los usuarios seguidos por un usuario específico
     @Query("""
         SELECT u.* FROM users u
         INNER JOIN follows f ON u.userId = f.followingId

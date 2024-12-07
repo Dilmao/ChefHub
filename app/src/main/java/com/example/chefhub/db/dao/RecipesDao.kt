@@ -30,4 +30,12 @@ interface RecipesDao {
     // Obtiene todas las recetas asociadas a un usuario específico
     @Query("SELECT * FROM recipes WHERE userId = :userId ORDER BY title ASC")
     fun getRecipesByUser(userId: Int): Flow<List<Recipes>>
+
+    // Obtiene recetas subidas por una lista de usuarios seguidos, ordenadas por fecha de publicación.
+    @Query("""
+        SELECT * FROM recipes 
+        WHERE userId IN (:followedUsersIds) 
+        ORDER BY createdAt DESC
+    """)
+    fun getRecipesByFollowedUsers(followedUsersIds: List<Int>): Flow<List<Recipes>>
 }

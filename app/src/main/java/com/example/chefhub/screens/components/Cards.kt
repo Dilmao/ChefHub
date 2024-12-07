@@ -87,8 +87,6 @@ fun RecipeCard(recipe: Recipes, onClick: () -> Unit) {
 @Composable
 fun UserCard(user: Users, onClick: () -> Unit) {
     // COMENTARIO.
-
-    // COMENTARIO.
     Card(
         colors = CardDefaults.cardColors(Color.Gray),
         modifier = Modifier.fillMaxWidth(),
@@ -105,7 +103,7 @@ fun UserCard(user: Users, onClick: () -> Unit) {
                     contentDescription = "Receta",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(100.dp)
+                        .size(50.dp)
                         .clip(CircleShape)
                 )
             }

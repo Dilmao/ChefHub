@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,21 +36,21 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.chefhub.R
 import com.example.chefhub.navigation.AppScreens
-import com.example.chefhub.scaffold.MyAccountTopAppBar
 import com.example.chefhub.scaffold.MyMainBottomBar
+import com.example.chefhub.screens.components.FollowButton
 import com.example.chefhub.screens.components.InvisibleButton
 import com.example.chefhub.screens.components.RecipeCard
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
-fun AccountScreen(navController: NavController, appViewModel: AppViewModel) {
+fun ViewedUserScreen(navController: NavController, appViewModel: AppViewModel) {
     // COMENTARIO.
     val appUiState by appViewModel.appUiState.collectAsState()
 
     // COMENTARIO.
     Scaffold(
-        topBar = { MyAccountTopAppBar(appUiState.user.userName, navController) },
-        bottomBar = { MyMainBottomBar("Account", navController) }
+        topBar = {  },
+        bottomBar = { MyMainBottomBar("Search", navController) }
     ) { paddingValues ->
         // COMENTARIO.
         Box(
@@ -57,22 +59,21 @@ fun AccountScreen(navController: NavController, appViewModel: AppViewModel) {
                 .padding(paddingValues)
         ) {
             // COMENTARIO.
-            AccountScreenContent(navController, appViewModel)
+            ViewedUserScreenContent(navController, appViewModel)
         }
     }
 }
 
 @Composable
-fun AccountScreenContent(navController: NavController, appViewModel: AppViewModel) {
+fun ViewedUserScreenContent(navController: NavController, appViewModel: AppViewModel) {
     // COMENTARIO.
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
-    var loadedRecipes by remember { mutableStateOf(false) }
-
-    // COMENTARIO.
-    if (!loadedRecipes) {
-        appViewModel.onChangeView("recipes")
-        loadedRecipes = true
+    var isFollowing by remember { mutableStateOf(false) }
+    appUiState.following.forEach { user ->
+        if (user.userId == appUiState.viewedUser.userId) {
+            isFollowing = true
+        }
     }
 
     // COMENTARIO.
@@ -117,7 +118,21 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
                 .fillMaxWidth()
                 .padding(start = 20.dp)
         ) {
-            Text(appUiState.user.userName)
+            Text(appUiState.viewedUser.userName)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp)
+        ) {
+            FollowButton(
+                onClick = { appViewModel.onFollowUser(isFollowing) },
+                isFollowed = isFollowing
+            )
         }
         Spacer(modifier = Modifier.height(20.dp))
 

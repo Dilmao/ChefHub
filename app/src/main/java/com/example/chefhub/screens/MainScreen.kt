@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -14,12 +16,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.scaffold.MyMainBottomBar
+import com.example.chefhub.screens.components.RecipeCard
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
@@ -46,15 +53,30 @@ fun MainScreenBodyContent(navController: NavHostController, appViewModel: AppVie
     // COMENTARIO.
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
+    var loaded by remember { mutableStateOf(false) }
 
     // COMENTARIO.
-    Column(
+    if (!loaded) {
+        appViewModel.loadMain()
+        loaded = true
+    }
+
+    // COMENTARIO.
+    LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
+        verticalArrangement = Arrangement.Top,
+        modifier = Modifier.fillMaxWidth().padding(10.dp)
     ) {
-        // COMENTARIO. TODO: Base de Datos necesaria
+        items(appUiState.recipes.size) { index ->
+            if (appUiState.recipes[index].userId != appUiState.user.userId) {
+                RecipeCard(
+                    recipe = appUiState.recipes[index],
+                    onClick = {
+                        appViewModel.onSelectRecipe(appUiState.recipes[index])
+                        navController.navigate(AppScreens.RecipeScreen.route)
+                    }
+                )
+            }
+        }
     }
 }

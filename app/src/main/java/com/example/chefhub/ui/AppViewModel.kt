@@ -1,12 +1,12 @@
 package com.example.chefhub.ui
 
 import android.content.Context
-import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chefhub.db.ChefhubDB
 import com.example.chefhub.db.SettingOption
 import com.example.chefhub.db.data.Favorites
+import com.example.chefhub.db.data.Follows
 import com.example.chefhub.db.data.Recipes
 import com.example.chefhub.db.data.Users
 import com.example.chefhub.db.repository.RecipesRepository
@@ -262,6 +262,25 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
             }
     }
 
+    /** Funciones Main **/
+    fun loadMain() {
+        viewModelScope.launch {
+            val user = appUiState.value.user
+
+            // Obtener los usuarios seguidos y transformar el Flow en una lista de IDs.
+            val followedUsers = database.followsDao.getFollowingForUser(user.userId).firstOrNull()
+            val followedUsersIds = followedUsers?.map { it.userId } ?: emptyList()
+
+            // Obtener las recetas de los usuarios seguidos y convertirlas en MutableList.
+            val recipesList = database.recipesDao.getRecipesByFollowedUsers(followedUsersIds).firstOrNull() ?: emptyList()
+
+            // Actualizar el estado de la UI.
+            _appUiState.update { currentState ->
+                currentState.copy(recipes = recipesList.toMutableList())
+            }
+        }
+    }
+
     /** Funciones Search **/
     fun onSearchChanged(search: String) {
         // COMENTARIO.
@@ -477,6 +496,53 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
 
 
     /** Funciones Database **/
+    fun onSelectUser(user: Users) {
+        viewModelScope.launch {
+            // Obtener las recetas asociadas al usuario como una lista
+            val recipesList = database.recipesDao.getRecipesByUser(user.userId).firstOrNull() ?: emptyList()
+            val followedUsers = database.followsDao.getFollowingForUser(appUiState.value.user.userId).firstOrNull() ?: emptyList()
+
+            // Actualizar el estado de la UI con la lista obtenida
+            _appUiState.update { currentState ->
+                currentState.copy(
+                    viewedUser = user,
+                    recipes = ArrayList(recipesList.toCollection(mutableListOf())),
+                    following = ArrayList(followedUsers.toCollection(mutableListOf())),
+                )
+            }
+        }
+    }
+
+    fun onFollowUser(userFollowed: Boolean) {
+        val followerId = appUiState.value.user.userId
+        val followingId = appUiState.value.viewedUser.userId
+        val follows = Follows(followerId, followingId)
+
+        viewModelScope.launch {
+            if (userFollowed) {
+                // Elimina la relación de la base de datos.
+                database.followsDao.deleteFollower(follows)
+                println("Delete follows: $followerId; $followingId; $follows")
+            } else {
+                // Inserta la relación en la base de datos.
+                database.followsDao.insertFollower(follows)
+                println("Insert follows: $followerId; $followingId; $follows")
+            }
+
+            val followsTable = database.followsDao.getFollowingForUser(followerId).firstOrNull() ?: emptyList()
+            println("Following for user $followerId: $followsTable")
+
+            // Se obtiene la lista actualizada de usuarios seguidos.
+            val updatedFollowedUsers = database.followsDao.getFollowingForUser(followerId).firstOrNull() ?: emptyList()
+
+            // Actualizar el estado de la UI con la lista actualizada.
+            _appUiState.update { currentState ->
+                currentState.copy(following = updatedFollowedUsers.toMutableList())
+            }
+        }
+    }
+
+
     fun onSelectRecipe(recipe: Recipes) {
         val prepHour = recipe.prepTime?.div(60) ?: 0
         val prepMin = recipe.prepTime?.rem(60) ?: 0

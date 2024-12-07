@@ -19,6 +19,7 @@ import com.example.chefhub.screens.RecipeScreen
 import com.example.chefhub.screens.RegisterScreen
 import com.example.chefhub.screens.SearchScreen
 import com.example.chefhub.screens.SettingsScreen
+import com.example.chefhub.screens.ViewedUserScreen
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
@@ -41,6 +42,7 @@ fun AppNavigation() {
         composable(route = AppScreens.PasswordRecoveryScreen.route) { PasswordRecoveryScreen(navController, appViewModel) }
         composable(route = AppScreens.MainScreen.route) { MainScreen(navController, appViewModel) }
         composable(route = AppScreens.SearchScreen.route) { SearchScreen(navController, appViewModel) }
+        composable(route = AppScreens.ViewedUserScreen.route) { ViewedUserScreen(navController, appViewModel) }
         composable(route = AppScreens.AddRecipeScreen.route) { AddRecipeScreen(navController, appViewModel) }
         composable(route = AppScreens.ModifyRecipeScreen.route) { ModifyRecipeScreen(navController, appViewModel) }
         composable(route = AppScreens.RecipeScreen.route) { RecipeScreen(navController, appViewModel) }
