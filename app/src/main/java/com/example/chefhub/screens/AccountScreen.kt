@@ -36,6 +36,7 @@ import com.example.chefhub.R
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.scaffold.MyAccountTopAppBar
 import com.example.chefhub.scaffold.MyMainBottomBar
+import com.example.chefhub.screens.components.ContentAlert
 import com.example.chefhub.screens.components.InvisibleButton
 import com.example.chefhub.screens.components.RecipeCard
 import com.example.chefhub.ui.AppViewModel
@@ -47,7 +48,7 @@ fun AccountScreen(navController: NavController, appViewModel: AppViewModel) {
 
     // COMENTARIO.
     Scaffold(
-        topBar = { MyAccountTopAppBar(appUiState.user.userName, navController) },
+        topBar = { MyAccountTopAppBar(appUiState.user.userName, navController, appViewModel) },
         bottomBar = { MyMainBottomBar("Account", navController) }
     ) { paddingValues ->
         // COMENTARIO.
@@ -68,10 +69,11 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
     var loadedRecipes by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
     // COMENTARIO.
     if (!loadedRecipes) {
-        appViewModel.onChangeView("recipes")
+        appViewModel.loadAccount()
         loadedRecipes = true
     }
 
@@ -99,13 +101,13 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
             )
 
             // COMENTARIO.
-            Text("0\nRecetas", textAlign = TextAlign.Center)
+            Text("${appUiState.recipes.size}\nRecetas", textAlign = TextAlign.Center)
 
             // COMENTARIO.
-            Text("0\nSeguidores", textAlign = TextAlign.Center)
+            Text("${appUiState.followers.size}\nSeguidores", textAlign = TextAlign.Center)
 
             // COMENTARIO.
-            Text("0\nSeguidos", textAlign = TextAlign.Center)
+            Text("${appUiState.following.size}\nSeguidos", textAlign = TextAlign.Center)
         }
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -148,7 +150,7 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
             // COMENTARIO.
             InvisibleButton(
                 texto = "¿ALGO?",
-                onClick = { appViewModel.onChangeView("something") }
+                onClick = { showDialog = true }
             )
         }
 
@@ -170,5 +172,11 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
                 )
             }
         }
+    }
+
+    if (showDialog) {
+        ContentAlert(
+            onDismissRequest = { showDialog = false }
+        )
     }
 }

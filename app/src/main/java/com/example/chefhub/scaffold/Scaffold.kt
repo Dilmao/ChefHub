@@ -28,13 +28,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.chefhub.db.settingOptions
 import com.example.chefhub.navigation.AppScreens
+import com.example.chefhub.ui.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyAccountTopAppBar(
     titulo: String,
-    navController: NavController
+    navController: NavController,
+    appViewModel: AppViewModel
 ) {
     TopAppBar(
         title = { Text(text = titulo, color = Color.Black) }, // Título en negro
@@ -44,7 +47,10 @@ fun MyAccountTopAppBar(
             actionIconContentColor = Color.Black
         ),
         actions = {
-            IconButton(onClick = { navController.navigate(AppScreens.SettingsScreen.route) }) {
+            IconButton(onClick = {
+                appViewModel.onChangeSettingsScreen(settingOptions)
+                navController.navigate(AppScreens.SettingsScreen.route)
+            }) {
                 Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings", tint = Color.Black)
             }
         }

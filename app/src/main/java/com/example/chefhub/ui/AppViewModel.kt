@@ -429,6 +429,24 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
 
 
     /** Funciones AccountScreen **/
+    fun loadAccount() {
+        val userId = appUiState.value.user.userId
+
+        viewModelScope.launch {
+            val recipes = database.recipesDao.getRecipesByUser(userId).firstOrNull() ?: emptyList()
+            val followers = database.followsDao.getFollowersForUser(userId).firstOrNull() ?: emptyList()
+            val following = database.followsDao.getFollowingForUser(userId).firstOrNull() ?: emptyList()
+
+            _appUiState.update { currentState ->
+                currentState.copy(
+                    recipes = recipes.toCollection(mutableListOf()),
+                    followers = followers.toCollection(mutableListOf()),
+                    following = following.toCollection(mutableListOf())
+                )
+            }
+        }
+    }
+
     fun onChangeView(
         view: String,
     ) {
@@ -473,6 +491,30 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         }
     }
 
+    fun onChangeSettingsScreen(newList: List<SettingOption>) {
+        _appUiState.update { currentState ->
+            currentState.copy(settingsOptions = newList) // TODO: Arreglar
+        }
+    }
+
+    fun logOut() {
+        val auth: FirebaseAuth = Firebase.auth
+        auth.signOut()
+
+        _appUiState.update { currentState ->
+            currentState.copy(
+                user = Users(),
+                viewedUser = Users(),
+                users = arrayListOf(),
+                followers = arrayListOf(),
+                following = arrayListOf(),
+                recipe = Recipes(),
+                recipes = arrayListOf(),
+                favorites = arrayListOf(),
+            )
+        }
+    }
+
     fun resetRecipeValues() {
         // Se reiniciar los datos del usuario.
         val recipe = Recipes()
@@ -487,13 +529,6 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
             )
         }
     }
-
-    fun onChangeSettingsScreen(newList: List<SettingOption>) {
-        _appUiState.update { currentState ->
-            currentState.copy(settingsOptions = newList) // TODO: Arreglar
-        }
-    }
-
 
     /** Funciones Database **/
     fun onSelectUser(user: Users) {

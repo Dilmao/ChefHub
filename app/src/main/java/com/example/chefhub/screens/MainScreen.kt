@@ -55,6 +55,7 @@ fun MainScreenBodyContent(navController: NavHostController, appViewModel: AppVie
     val context = LocalContext.current
     var loaded by remember { mutableStateOf(false) }
 
+    // TODO: La primera vez que se carga MainScreen, no se cargan las recetas.
     // COMENTARIO.
     if (!loaded) {
         appViewModel.loadMain()

@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import com.example.chefhub.R
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.scaffold.MyMainBottomBar
+import com.example.chefhub.screens.components.ContentAlert
 import com.example.chefhub.screens.components.InvisibleButton
 import com.example.chefhub.screens.components.RecipeCard
 import com.example.chefhub.screens.components.SearchField
@@ -60,6 +61,7 @@ fun SearchScreenContent(navController: NavController, appViewModel: AppViewModel
     val context = LocalContext.current
     var type by rememberSaveable { mutableStateOf("recipes") }
     var loaded by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
     // COMENTARIO.
     if (!loaded) {
@@ -80,7 +82,7 @@ fun SearchScreenContent(navController: NavController, appViewModel: AppViewModel
             SearchField(
                 value = appUiState.search,
                 onValueChange = { appViewModel.onSearchChanged(it) },
-                onSearch= { appViewModel.onSearch(type) }
+                onSearch= { showDialog = true }
             )
         }
 
@@ -106,10 +108,7 @@ fun SearchScreenContent(navController: NavController, appViewModel: AppViewModel
 
             InvisibleButton(
                 texto = "¿ALGO?",
-                onClick = {
-                    type = "other"
-                    appViewModel.onSearch(type)
-                }
+                onClick = { showDialog = true }
             )
         }
 
@@ -146,5 +145,11 @@ fun SearchScreenContent(navController: NavController, appViewModel: AppViewModel
                 // TODO
             }
         }
+    }
+
+    if (showDialog) {
+        ContentAlert(
+            onDismissRequest = { showDialog = false }
+        )
     }
 }
