@@ -63,6 +63,14 @@ private val accountOptions = listOf(
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
     SettingOption(
+        title = "Cambiar biografía",
+        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
+    ),
+    SettingOption(
+        title = "Cambiar foto de perfil",
+        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
+    ),
+    SettingOption(
         title = "Crear una nueva cuenta",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),

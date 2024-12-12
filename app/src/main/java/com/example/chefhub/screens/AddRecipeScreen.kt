@@ -220,8 +220,11 @@ fun AddRecipeScreenContent(navController: NavController, appViewModel: AppViewMo
     ) {
         // Botón para guardar la receta.
         Button(onClick = {
-            appViewModel.onSaveRecipe(context, "create")
-            navController.navigate(AppScreens.AccountScreen.route)
+            appViewModel.onSaveRecipe(context, "create") { createSuccesfull ->
+                if (createSuccesfull) {
+                    navController.navigate(AppScreens.AccountScreen.route)
+                }
+            }
         }) {
             Text("Crear")
         }

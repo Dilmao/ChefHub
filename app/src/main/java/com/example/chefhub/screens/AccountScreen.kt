@@ -101,13 +101,22 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
             )
 
             // COMENTARIO.
-            Text("${appUiState.recipes.size}\nRecetas", textAlign = TextAlign.Center)
+            InvisibleButton(
+                texto = "${appUiState.recipes.size}\nRecetas",
+                onClick = { showDialog = true }
+            )
 
             // COMENTARIO.
-            Text("${appUiState.followers.size}\nSeguidores", textAlign = TextAlign.Center)
+            InvisibleButton(
+                texto = "${appUiState.followers.size}\nSeguidores",
+                onClick = { showDialog = true }
+            )
 
             // COMENTARIO.
-            Text("${appUiState.following.size}\nSeguidos", textAlign = TextAlign.Center)
+            InvisibleButton(
+                texto = "${appUiState.following.size}\nSeguidos",
+                onClick = { showDialog = true }
+            )
         }
         Spacer(modifier = Modifier.height(10.dp))
 

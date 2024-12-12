@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.chefhub.db.data.Recipes
 
@@ -42,7 +43,7 @@ fun InvisibleButton(
             contentColor = Color.Black
         )
     ) {
-        Text(text = texto)
+        Text(text = texto, textAlign = TextAlign.Center)
     }
 }
 

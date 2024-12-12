@@ -214,8 +214,11 @@ fun ModifyRecipeScreenContent(navController: NavController, appViewModel: AppVie
     ) {
         // Botón para guardar la receta.
         Button(onClick = {
-            appViewModel.onSaveRecipe(context, "save")
-            navController.navigate(AppScreens.AccountScreen.route)
+            appViewModel.onSaveRecipe(context, "save") { saveSuccesfull ->
+                if (saveSuccesfull) {
+                    navController.navigate(AppScreens.LoginScreen.route)
+                }
+            }
         }) {
             Text("Guardar")
         }

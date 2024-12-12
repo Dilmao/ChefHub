@@ -69,46 +69,45 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         val password = appUiState.value.user.password
 
         // Se intenta iniciar sesión con Firebase.
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                // Se guardan las credenciales de manera segura.
-                saveCredentials(context, email, password)
+        if (email.isEmpty() || password.isEmpty()) {
+            showMessage(context, "Correo y/o contraseña estan vacíos.")
+        } else {
+            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Se guardan las credenciales de manera segura.
+                    saveCredentials(context, email, password)
 
-                // Se sincronizan los datos del usuario desde la base de datos local.
-                viewModelScope.launch {
-                    try {
-                        val user = database.usersDao.getUserByEmail(email)
-                        if (user != null) {
-                            // Recoge las recetas favoritas en una lista mutable.
-                            val favoriteRecipes = database.favoritesDao.getFavoritesForUser(user.userId).first().toMutableList()
+                    // Se sincronizan los datos del usuario desde la base de datos local.
+                    viewModelScope.launch {
+                        try {
+                            val user = database.usersDao.getUserByEmail(email)
+                            if (user != null) {
+                                // Recoge las recetas favoritas en una lista mutable.
+                                val favoriteRecipes = database.favoritesDao.getFavoritesForUser(user.userId).first().toMutableList()
 
-                            // Actualiza el estado de la UI.
-                            _appUiState.update { currentState ->
-                                currentState.copy(
-                                    user = user,
-                                    favorites = favoriteRecipes
-                                )
+                                // Actualiza el estado de la UI.
+                                _appUiState.update { currentState ->
+                                    currentState.copy(
+                                        user = user,
+                                        favorites = favoriteRecipes
+                                    )
+                                }
+                            } else {
+                                showMessage(context, "Usuario autenticado, pero no encontrado localmente.")
                             }
-                        } else {
-                            showMessage(context, "Usuario autenticado, pero no encontrado localmente.")
+                        } catch (e: Exception) {
+                            showMessage(context, "Error al sincronizar datos del usuario.")
                         }
-                    } catch (e: Exception) {
-                        showMessage(context, "Error al sincronizar datos del usuario.")
                     }
-                }
 
-                // Mensaje de exito.
-                showMessage(context, "Inicio de sesión exitoso.")
-                callback(true)
-            } else {
-                // Manejo de errores de Firebase
-                val errorMessage = when (task.exception) {
-                    is FirebaseAuthInvalidUserException -> "El correo no está registrado."
-                    is FirebaseAuthInvalidCredentialsException -> "La contraseña es incorrecta."
-                    else -> "Error al iniciar sesión: ${task.exception?.message}"
+                    // Mensaje de exito.
+                    showMessage(context, "Inicio de sesión exitoso.")
+                    callback(true)
+                } else {
+                    // Manejo de errores de Firebase
+                    showMessage(context, "Correo y/o contraseña son incorrectos.")
+                    callback(false)
                 }
-                showMessage(context = context, mensaje = errorMessage)
-                callback(false)
             }
         }
     }
@@ -151,57 +150,61 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         val userRepository = UsersRepository(database.usersDao)
 
         // Comprueba si el nombre de usuario ya existe.
-        viewModelScope.launch {
-            val userExist = userRepository.getUserByUserName(newUserName) != null
-            if (userExist) {
-                showMessage(context, "El nombre de usuario ya está en uso.")
-                callback(false)
-                return@launch
-            }
-
-            // Registrar el usuario en Firebase.
-            auth.createUserWithEmailAndPassword(newEmail, newPassword).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Se guardan las credenciales de manera segura.
-                    saveCredentials(context, newEmail, newPassword)
-
-                    // Se crea el objeto Users para guardarlo en la base de datos local.
-                    val newUser = Users(
-                        userName = newUserName,
-                        email = newEmail,
-                        password = newPassword
-                    )
-
-                    // Se inserta el nuevo usuario en la base de datos local.
-                    viewModelScope.launch {
-                        try {
-                            // COMENTARIO.
-                            val favoriteRecipes = database.favoritesDao.getFavoritesForUser(newUser.userId).first().toMutableList()
-
-                            // COMENTARIO.
-                            userRepository.insertUser(newUser)
-                            _appUiState.update { currentState ->
-                                currentState.copy(
-                                    user = newUser,
-                                    favorites = favoriteRecipes
-                                )
-                            }
-                            showMessage(context, "Nuevo usuario creado con éxito.")
-                            callback(true)
-                        } catch (e: Exception) {
-                            showMessage(context, "Error al guardar el usuario en la base de datos local.")
-                            callback(false)
-                        }
-                    }
-                } else {
-                    // Mensaje de error.
-                    val errorMessage = when (task.exception) {
-                        is FirebaseAuthUserCollisionException -> "El correo electrónico ya está registrado."
-                        is FirebaseAuthWeakPasswordException -> "La contraseña es demasiado débil."
-                        else -> "Error al registrar el usuario: ${task.exception?.message}."
-                    }
-                    showMessage(context, errorMessage)
+        if (newEmail.isEmpty() || newPassword.isEmpty() || newUserName.isEmpty()) {
+            showMessage(context, "Usuario, correo y/o contraseña estan vacíos.")
+        } else {
+            viewModelScope.launch {
+                val userExist = userRepository.getUserByUserName(newUserName) != null
+                if (userExist) {
+                    showMessage(context, "El nombre de usuario ya está en uso.")
                     callback(false)
+                    return@launch
+                }
+
+                // Registrar el usuario en Firebase.
+                auth.createUserWithEmailAndPassword(newEmail, newPassword).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // Se guardan las credenciales de manera segura.
+                        saveCredentials(context, newEmail, newPassword)
+
+                        // Se crea el objeto Users para guardarlo en la base de datos local.
+                        val newUser = Users(
+                            userName = newUserName,
+                            email = newEmail,
+                            password = newPassword
+                        )
+
+                        // Se inserta el nuevo usuario en la base de datos local.
+                        viewModelScope.launch {
+                            try {
+                                // COMENTARIO.
+                                val favoriteRecipes = database.favoritesDao.getFavoritesForUser(newUser.userId).first().toMutableList()
+
+                                // COMENTARIO.
+                                userRepository.insertUser(newUser)
+                                _appUiState.update { currentState ->
+                                    currentState.copy(
+                                        user = newUser,
+                                        favorites = favoriteRecipes
+                                    )
+                                }
+                                showMessage(context, "Nuevo usuario creado con éxito.")
+                                callback(true)
+                            } catch (e: Exception) {
+                                showMessage(context, "Error al guardar el usuario en la base de datos local.")
+                                callback(false)
+                            }
+                        }
+                    } else {
+                        // Mensaje de error.
+                        val errorMessage = when (task.exception) {
+                            is FirebaseAuthUserCollisionException -> "El correo electrónico ya está registrado."
+                            is FirebaseAuthWeakPasswordException -> "La contraseña es demasiado débil."
+                            else -> "Error al registrar el usuario: ${task.exception?.message}."
+                        }
+                        showMessage(context, errorMessage)
+                        callback(false)
+                    }
                 }
             }
         }
@@ -218,48 +221,63 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
     }
 
     fun recoverPassword( // TODO: Si el usuario cambia de contraseña, esta se modifica en Firebase, pero no en Room.
-        email: String
+        context: Context,
+        email: String,
+        callback: (Boolean) -> Unit
     ) {
         // Se obtiene la instancia de FirebaseAuth para enviar el correo de restablecimiento de contraseña.
         val auth = FirebaseAuth.getInstance()
         var errorMessage: String
 
-        // Se intenta enviar un correo electrónico para restablecer la contraseña a la dirección proporcionada.
-        auth.sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
-                // Si el envio del correo fue exitoso, se muestra un mensaje de éxito.
-                if (task.isSuccessful) {
-                    errorMessage =
-                        "Se ha enviado un correo electrónico a la dirección: \"${appUiState.value.user.email}\".\n Siga las instrucciones en el correo para cambiar la contraseña."
-                } else {
-                    // Si la tarea falla, se verifica la excepción que provocó el fallo. TODO: No se cuando entra en este caso :v
-                    errorMessage = when (val exception = task.exception) {
-                        // Si es una excepción de FirebaseAuth.
-                        is FirebaseAuthException -> {
-                            // Si el error es que no se encontró un usuario con ese correo.
-                            if (exception.errorCode == "ERROR_USER_NOT_FOUND") {
-                                "No se ha encontrado una cuenta con ese correo electrónico."
-                            } else {
-                                // En caso de otro error de FirebaseAuth.
-                                "Se ha producido un error. Por favor, inténtalo de nuevo."
+        if (email.isEmpty()) {
+            showMessage(context, "El correo esta vacío.")
+        } else {
+            // Se intenta enviar un correo electrónico para restablecer la contraseña a la dirección proporcionada.
+            viewModelScope.launch {
+                val userExist = database.usersDao.getUserByEmail(email) != null
+                if (userExist) {
+                    showMessage(context, "El nombre de usuario ya está en uso.")
+                    callback(false)
+                    return@launch
+                }
+
+                auth.sendPasswordResetEmail(email)
+                    .addOnCompleteListener { task ->
+                        // Si el envio del correo fue exitoso, se muestra un mensaje de éxito.
+                        if (task.isSuccessful) {
+                            errorMessage =
+                                "Se ha enviado un correo electrónico a la dirección: \"${appUiState.value.user.email}\".\n Siga las instrucciones en el correo para cambiar la contraseña."
+                        } else {
+                            // Si la tarea falla, se verifica la excepción que provocó el fallo. TODO: No se cuando entra en este caso :v
+                            errorMessage = when (val exception = task.exception) {
+                                // Si es una excepción de FirebaseAuth.
+                                is FirebaseAuthException -> {
+                                    // Si el error es que no se encontró un usuario con ese correo.
+                                    if (exception.errorCode == "ERROR_USER_NOT_FOUND") {
+                                        "No se ha encontrado una cuenta con ese correo electrónico."
+                                    } else {
+                                        // En caso de otro error de FirebaseAuth.
+                                        "Se ha producido un error. Por favor, inténtalo de nuevo."
+                                    }
+                                }
+
+                                else -> {
+                                    // Si es otro tipo de error no especificado.
+                                    "Error desconocido. Por favor, intenta más tarde."
+                                }
                             }
                         }
 
-                        else -> {
-                            // Si es otro tipo de error no especificado.
-                            "Error desconocido. Por favor, intenta más tarde."
+                        // Se actualiza el estado de la UI para mostrar el mensaje de éxito o error correspondiente.
+                        _appUiState.update { currentState ->
+                            currentState.copy(
+                                showMessage = true,
+                                messageText = errorMessage,
+                            )
                         }
                     }
-                }
-
-                // Se actualiza el estado de la UI para mostrar el mensaje de éxito o error correspondiente.
-                _appUiState.update { currentState ->
-                    currentState.copy(
-                        showMessage = true,
-                        messageText = errorMessage,
-                    )
-                }
             }
+        }
     }
 
     /** Funciones Main **/
@@ -387,7 +405,8 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
 
     fun onSaveRecipe(
         context: Context,
-        action: String
+        action: String,
+        callback: (Boolean) -> Unit
     ) { // TODO: Asegurar que los campos obligatorios esta rellenados.
         val uiState = appUiState.value
         val recipesRepository = RecipesRepository(database.recipesDao)
@@ -404,25 +423,30 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
             servings = uiState.servings
         )
 
-        viewModelScope.launch {
-            try {
-                when (action.lowercase()) {
-                    "create" -> {
-                        recipesRepository.insertRecipe(recipe)
-                        showMessage(context, "Receta creada con éxito.")
+        if (recipe.title.isEmpty()) {
+            showMessage(context, "Título vacío")
+            callback(false)
+        } else {
+            viewModelScope.launch {
+                try {
+                    when (action.lowercase()) {
+                        "create" -> {
+                            recipesRepository.insertRecipe(recipe)
+                            showMessage(context, "Receta creada con éxito.")
+                        }
+                        "save" -> {
+                            recipe.recipeId = uiState.recipe.recipeId
+                            recipesRepository.updateRecipe(recipe)
+                            showMessage(context, "Receta actualizada con éxito.")
+                        }
+                        else -> {
+                            showMessage(context, "Acción desconocida: $action.")
+                        }
                     }
-                    "save" -> {
-                        recipe.recipeId = uiState.recipe.recipeId
-                        recipesRepository.updateRecipe(recipe)
-                        showMessage(context, "Receta actualizada con éxito.")
-                    }
-                    else -> {
-                        showMessage(context, "Acción desconocida: $action.")
-                    }
+                } catch (e: Exception) {
+                    val errorMsg = "Error al ${if (action == "create") "crear" else "guardar"} la receta: ${e.message}"
+                    showMessage(context, errorMsg)
                 }
-            } catch (e: Exception) {
-                val errorMsg = "Error al ${if (action == "create") "crear" else "guardar"} la receta: ${e.message}"
-                showMessage(context, errorMsg)
             }
         }
     }

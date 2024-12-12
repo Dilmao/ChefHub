@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.chefhub.navigation.AppScreens
@@ -46,6 +47,7 @@ fun PasswordRecoveryScreen(navController: NavHostController, appViewModel: AppVi
 fun PasswordRecoveryScreenBodyContent(navController: NavHostController, appViewModel: AppViewModel) {
     // Se obtiene el estado actual de la UI desde el ViewModel.
     val appUiState by appViewModel.appUiState.collectAsState()
+    val context = LocalContext.current
 
     // Estructura en columna para alinear los elementos.
     Column(
@@ -72,7 +74,13 @@ fun PasswordRecoveryScreenBodyContent(navController: NavHostController, appViewM
         // Botón para el restablecimiento de contraseña.
         SimpleButton(
             texto = "Reestablecer contraseña",
-            onClick = { appViewModel.recoverPassword(appUiState.user.email) }
+            onClick = {
+                appViewModel.recoverPassword(context, appUiState.user.email) { recoverSuccesfull ->
+                    if (recoverSuccesfull) {
+                        navController.navigate(AppScreens.LoginScreen.route)
+                    }
+                }
+            }
         )
         Spacer(modifier = Modifier.height(20.dp))
 
