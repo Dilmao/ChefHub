@@ -10,16 +10,11 @@ import com.example.chefhub.db.data.Follows
 import com.example.chefhub.db.data.Recipes
 import com.example.chefhub.db.data.Users
 import com.example.chefhub.db.repository.RecipesRepository
-import com.example.chefhub.db.repository.UsersRepository
-import com.example.chefhub.screens.components.saveCredentials
 import com.example.chefhub.screens.components.showMessage
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,13 +23,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.math.exp
 
 class AppViewModel(private val database: ChefhubDB): ViewModel() {
     private val _appUiState = MutableStateFlow(AppUiState())
     val appUiState: StateFlow<AppUiState> = _appUiState.asStateFlow()
 
     /** Funciones generales **/
-    // TODO: Pensar en hacer una funcion changeUI (como el changeRegister) en vez de tener varias funciones change...
     fun restartBoolean() {
         // Se reinician las variables de tipo boolean.
         _appUiState.update { currentState ->
@@ -42,168 +37,216 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         }
     }
 
-    /** Funciones Login **/
-    fun onLoginChanged(
-        email: String,
-        password: String
+
+    /** Funciones User **/
+    fun <T> onUserChanged(
+        newValue: T,
+        valueName: String,
     ) {
-        // Se actualiza el estado de la página LoginScreen.
+        // Se obtiene el estado actual de la UI y se prepara el estado actualizado.
+        val currentState = appUiState.value
+        var updatedState = currentState
+
+        // Se actualiza el estado dependiendo del campo que se esté modificando.
+        when (valueName) {
+            "userName" -> if (newValue is String) updatedState = currentState.copy(user = currentState.user.copy(userName = newValue))
+            "email" -> if (newValue is String) updatedState = currentState.copy(user = currentState.user.copy(email = newValue))
+            "password" -> if (newValue is String) updatedState = currentState.copy(user = currentState.user.copy(password = newValue))
+            "profilePicture" -> if (newValue is String) updatedState = currentState.copy(user = currentState.user.copy(profilePicture = newValue))
+            "bio" -> if (newValue is String) updatedState = currentState.copy(user = currentState.user.copy(bio = newValue))
+            "isActive" -> if (newValue is Boolean) updatedState = currentState.copy(user = currentState.user.copy(isActive = newValue))
+        }
+
+        // Se actualiza el estado de la UI.
+        _appUiState.update { updatedState }
+    }
+
+    fun resetUserValues() {
+        // Se reiniciar los datos del usuario.
+        val user = Users()
+        val favorites: MutableList<Recipes> = arrayListOf()
         _appUiState.update { currentState ->
             currentState.copy(
-                user = currentState.user.copy(
-                    email = email,
-                    password = password
-                )
+                user = user,
+                favorites = favorites
             )
         }
     }
 
-    fun checkLogin(
-        context: Context,
-        callback: (Boolean) -> Unit
+
+    /** Funciones Recipe **/
+    fun <T> onRecipeChanged(
+        newValue: T,
+        valueName: String,
     ) {
-        val auth: FirebaseAuth = Firebase.auth
-
-        // Obtener correo y contraseña del estado de la UI.
-        val email = appUiState.value.user.email
-        val password = appUiState.value.user.password
-
-        // Se intenta iniciar sesión con Firebase.
-        if (email.isEmpty() || password.isEmpty()) {
-            showMessage(context, "Correo y/o contraseña estan vacíos.")
-        } else {
-            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Se guardan las credenciales de manera segura.
-                    saveCredentials(context, email, password)
-
-                    // Se sincronizan los datos del usuario desde la base de datos local.
-                    viewModelScope.launch {
-                        try {
-                            val user = database.usersDao.getUserByEmail(email)
-                            if (user != null) {
-                                // Recoge las recetas favoritas en una lista mutable.
-                                val favoriteRecipes = database.favoritesDao.getFavoritesForUser(user.userId).first().toMutableList()
-
-                                // Actualiza el estado de la UI.
-                                _appUiState.update { currentState ->
-                                    currentState.copy(
-                                        user = user,
-                                        favorites = favoriteRecipes
-                                    )
-                                }
-                            } else {
-                                showMessage(context, "Usuario autenticado, pero no encontrado localmente.")
-                            }
-                        } catch (e: Exception) {
-                            showMessage(context, "Error al sincronizar datos del usuario.")
-                        }
-                    }
-
-                    // Mensaje de exito.
-                    showMessage(context, "Inicio de sesión exitoso.")
-                    callback(true)
-                } else {
-                    // Manejo de errores de Firebase
-                    showMessage(context, "Correo y/o contraseña son incorrectos.")
-                    callback(false)
-                }
-            }
-        }
-    }
-
-    /** Funciones Register **/
-    fun onRegisterChanged(
-        newValue: String,
-        valueName: String
-    ) {
-        // Se obtiene el estado actual de la UI.
+        // Se obtiene el estado actual de la UI y se prepara el estado actualizado.
         val currentState = appUiState.value
+        var updatedState = currentState
 
-        // Se actualiza el estado dependiendo del campo que se esté modificando dentro del usuario.
-        val updatedState = when (valueName) {
-            "userName" -> currentState.copy(user = currentState.user.copy(userName = newValue))
-            "email" -> currentState.copy(user = currentState.user.copy(email = newValue))
-            "password" -> currentState.copy(user = currentState.user.copy(password = newValue))
-            // En caso de que el valor modificado no esté entre las opciones, se muestra un mensaje de error inesperado.
-            else -> currentState.copy(
-                messageText = "Error inesperado en RegisterScreen ($valueName)",
-                showMessage = true
-            ) // TODO: Mejorar el manejo de errores para casos inesperados.
+        // Se actualiza el estado dependiendo del campo que se esté modificando.
+        when (valueName) {
+            "title" -> if (newValue is String) updatedState = currentState.copy(recipe = currentState.recipe.copy(title = newValue))
+            "description" -> if (newValue is String) updatedState = currentState.copy(recipe = currentState.recipe.copy(description = newValue))
+            "imageUrl" -> if (newValue is String) updatedState = currentState.copy(recipe = currentState.recipe.copy(imageUrl = newValue))
+            "prepHour" -> if (newValue is Int) updatedState = currentState.copy(prepHour = newValue)
+            "prepMin" -> if (newValue is Int) updatedState = currentState.copy(prepMin = newValue)
+            "cookHour" -> if (newValue is Int) updatedState = currentState.copy(cookHour = newValue)
+            "cookMin" -> if (newValue is Int) updatedState = currentState.copy(cookMin = newValue)
+            "servings" -> if (newValue is Int) updatedState = currentState.copy(servings = newValue)
         }
 
-        // Se actualiza el estado de la página RegisterScreen.
+        // Se actualiza el estado de la UI.
         _appUiState.update { updatedState }
     }
 
-
-    fun checkRegister(
-        context: Context,
-        callback: (Boolean) -> Unit
+    fun onMutableListAddElement(
+        list: ArrayList<String>,
+        listName: String
     ) {
-        val auth = Firebase.auth
+        // Crear una copia de la lista en forma de ArrayList.
+        val updatedList = ArrayList(list)
+        updatedList.add("")
 
-        // Obtener datos del estado de la UI.
+        // COMENTARIO.
+        _appUiState.value = when (listName) {
+            "Ingredient" -> appUiState.value.copy(
+                recipe = appUiState.value.recipe.copy(ingredients = updatedList)
+            )
+            "Instruction" -> appUiState.value.copy(
+                recipe = appUiState.value.recipe.copy(instructions = updatedList)
+            )
+            else -> throw IllegalArgumentException("El nombre de la lista '$listName' no es válido.")
+        }
+    }
+
+    fun onMutableListChanged(
+        newValue: String,
+        index: Int,
+        list: ArrayList<String>,
+        listName: String
+    ) {
+        // Crear una copia de la lista en forma de ArrayList.
+        val updatedList = ArrayList(list)
+        updatedList[index] = newValue
+
+        // Actualizar el estado de la UI con la lista modificada.
+        _appUiState.value = when (listName) {
+            "Ingredient" -> appUiState.value.copy(
+                recipe = appUiState.value.recipe.copy(ingredients = updatedList)
+            )
+            "Instruction" -> appUiState.value.copy(
+                recipe = appUiState.value.recipe.copy(instructions = updatedList)
+            )
+            else -> throw IllegalArgumentException("El nombre de la lista '$listName' no es válido.")
+        }
+    }
+
+    fun resetRecipeValues() {
+        // Se reiniciar los datos del usuario.
+        val recipe = Recipes()
+        _appUiState.update { currentState ->
+            currentState.copy(
+                recipe = recipe,
+                prepHour = 0,
+                prepMin = 0,
+                cookHour = 0,
+                cookMin = 0,
+                servings = 0
+            )
+        }
+    }
+
+
+    /** Funciones Login **/
+    fun checkLogin(callback: (Int) -> Unit) {
+        val auth: FirebaseAuth = Firebase.auth
+        val email = appUiState.value.user.email
+        val password = appUiState.value.user.password
+
+        // Validar si los campos están vacíos.
+        viewModelScope.launch {
+            if (email.isEmpty() || password.isEmpty()) {
+                callback(1) // 1: Campos están vacíos.
+            } else if (database.usersDao.getUserByEmail(email) == null) {
+                callback(3) // 3: Usuario no encontrado en SQLite.
+            } else {
+                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        viewModelScope.launch {
+                            try {
+                                // Sincronizar datos del usuario desde SQLite.
+                                val user = database.usersDao.getUserByEmail(email)
+                                if (user != null) {
+                                    // Actualizar el estado de la UI.
+                                    _appUiState.update { currentState ->
+                                        currentState.copy(user = user)
+                                    }
+                                    callback(0) // 0: Inicio de sesión exitoso.
+                                }
+                            } catch (e: Exception) {
+                                callback(4) // 4: Error al sincronizar datos del usuario.
+                            }
+                        }
+                    } else {
+                        callback(2) // Correo y/o contraseña incorrectos.
+                    }
+                }
+        }
+        }
+    }
+
+
+    /** Funciones Register **/
+    fun checkRegister(confirmPassword: String, callback: (Int) -> Unit) {
+        val auth = Firebase.auth
         val newUserName = appUiState.value.user.userName
         val newEmail = appUiState.value.user.email
         val newPassword = appUiState.value.user.password
-        val userRepository = UsersRepository(database.usersDao)
 
-        // Comprueba si el nombre de usuario ya existe.
-        if (newEmail.isEmpty() || newPassword.isEmpty() || newUserName.isEmpty()) {
-            showMessage(context, "Usuario, correo y/o contraseña estan vacíos.")
-        } else {
-            viewModelScope.launch {
-                val userExist = userRepository.getUserByUserName(newUserName) != null
-                if (userExist) {
-                    showMessage(context, "El nombre de usuario ya está en uso.")
-                    callback(false)
-                    return@launch
-                }
-
-                // Registrar el usuario en Firebase.
+        // Se inicia una operación en segundo plano.
+        viewModelScope.launch {
+            if (newEmail.isEmpty() || newPassword.isEmpty() || newUserName.isEmpty()) {
+                callback(1) // 1: Campos vacíos.
+            } else if(!newEmail.contains("@")) {
+                callback(2) // 2: El correo no contiene '@'.
+            } else if(newPassword.length < 10 || newPassword.length > 30) {
+                callback(3) // 3: La contraseña tiene un tamaño inválido.
+            } else if(!newPassword.equals(confirmPassword)) {
+                callback(4) // 4: Contraseña y confirmación no coindicen.
+            } else if(newEmail.equals(database.usersDao.getUserByEmail(newEmail)?.email)) {
+                callback(5) // 5: El correo ya existe en SQLite.
+            } else if(newUserName.equals(database.usersDao.getUserByUserName(newUserName)?.userName)) {
+                callback(6) // 6: El nombre ya existe en SQLite.
+            } else {
+                // Se registra el usuario en Firebase.
                 auth.createUserWithEmailAndPassword(newEmail, newPassword).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        // Se guardan las credenciales de manera segura.
-                        saveCredentials(context, newEmail, newPassword)
-
-                        // Se crea el objeto Users para guardarlo en la base de datos local.
+                        // Se crea un objeto 'Users' con la información del nuevo usuario.
                         val newUser = Users(
                             userName = newUserName,
                             email = newEmail,
                             password = newPassword
                         )
 
-                        // Se inserta el nuevo usuario en la base de datos local.
                         viewModelScope.launch {
                             try {
-                                // COMENTARIO.
-                                val favoriteRecipes = database.favoritesDao.getFavoritesForUser(newUser.userId).first().toMutableList()
-
-                                // COMENTARIO.
-                                userRepository.insertUser(newUser)
+                                // Se inserta el nuevo usuario en SQLite.
+                                database.usersDao.insertUser(newUser)
                                 _appUiState.update { currentState ->
-                                    currentState.copy(
-                                        user = newUser,
-                                        favorites = favoriteRecipes
-                                    )
+                                    currentState.copy(user = newUser)
                                 }
-                                showMessage(context, "Nuevo usuario creado con éxito.")
-                                callback(true)
+                                callback(0) // 0: Registro exitoso.
                             } catch (e: Exception) {
-                                showMessage(context, "Error al guardar el usuario en la base de datos local.")
-                                callback(false)
+                                callback(7) // 7: Error inesperado al guardar el usuario en SQLite.
                             }
                         }
                     } else {
-                        // Mensaje de error.
-                        val errorMessage = when (task.exception) {
-                            is FirebaseAuthUserCollisionException -> "El correo electrónico ya está registrado."
-                            is FirebaseAuthWeakPasswordException -> "La contraseña es demasiado débil."
-                            else -> "Error al registrar el usuario: ${task.exception?.message}."
+                        // Correo electrónico ya en uso en Firebase.
+                        if (task.exception is FirebaseAuthUserCollisionException) {
+                            callback(5) // 5: El correo ya existe en Firebase.
+                        } else {
+                            callback(7) // 7: Error inesperado al registrar el usuario en Firebase.
                         }
-                        showMessage(context, errorMessage)
-                        callback(false)
                     }
                 }
             }
@@ -211,71 +254,32 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
     }
 
     /** Funciones Password Recovery **/
-    fun onRecoveryChanged(
-        recoveryEmail: String
-    ) {
-        // Se actualiza el estado de la página PasswordRecoveryScreen.
-        _appUiState.update { currentState ->
-            currentState.copy(user = currentState.user.copy(email = recoveryEmail))
-        }
-    }
+    fun recoverPassword(callback: (Int) -> Unit) {
+        val auth = Firebase.auth
+        val email = appUiState.value.user.email
 
-    fun recoverPassword( // TODO: Si el usuario cambia de contraseña, esta se modifica en Firebase, pero no en Room.
-        context: Context,
-        email: String,
-        callback: (Boolean) -> Unit
-    ) {
-        // Se obtiene la instancia de FirebaseAuth para enviar el correo de restablecimiento de contraseña.
-        val auth = FirebaseAuth.getInstance()
-        var errorMessage: String
-
-        if (email.isEmpty()) {
-            showMessage(context, "El correo esta vacío.")
-        } else {
-            // Se intenta enviar un correo electrónico para restablecer la contraseña a la dirección proporcionada.
-            viewModelScope.launch {
-                val userExist = database.usersDao.getUserByEmail(email) != null
-                if (userExist) {
-                    showMessage(context, "El nombre de usuario ya está en uso.")
-                    callback(false)
-                    return@launch
-                }
-
-                auth.sendPasswordResetEmail(email)
-                    .addOnCompleteListener { task ->
-                        // Si el envio del correo fue exitoso, se muestra un mensaje de éxito.
-                        if (task.isSuccessful) {
-                            errorMessage =
-                                "Se ha enviado un correo electrónico a la dirección: \"${appUiState.value.user.email}\".\n Siga las instrucciones en el correo para cambiar la contraseña."
-                        } else {
-                            // Si la tarea falla, se verifica la excepción que provocó el fallo. TODO: No se cuando entra en este caso :v
-                            errorMessage = when (val exception = task.exception) {
-                                // Si es una excepción de FirebaseAuth.
-                                is FirebaseAuthException -> {
-                                    // Si el error es que no se encontró un usuario con ese correo.
-                                    if (exception.errorCode == "ERROR_USER_NOT_FOUND") {
-                                        "No se ha encontrado una cuenta con ese correo electrónico."
-                                    } else {
-                                        // En caso de otro error de FirebaseAuth.
-                                        "Se ha producido un error. Por favor, inténtalo de nuevo."
-                                    }
-                                }
-
-                                else -> {
-                                    // Si es otro tipo de error no especificado.
-                                    "Error desconocido. Por favor, intenta más tarde."
+        viewModelScope.launch {
+            if (email.isEmpty()) {
+                callback(1) // 1: Campo 'correo' vacío.
+            } else if (!email.equals(database.usersDao.getUserByEmail(email)?.email)) {
+                callback(2) // 2: Usuario no encontrado en SQLite.
+            } else {
+                // Se envia un correo para restablecer la contraseña.
+                auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        callback(0) // 0: Correo enviado correctamente.
+                    } else {
+                        when (val exception = task.exception) {
+                            is FirebaseAuthException -> {
+                                if (exception.errorCode == "ERROR_USER_NOT_FOUND") {
+                                    callback(2) // 2: Usuario no encontrado en Firebase.
+                                } else {
+                                    callback(3) // 3: Error inesperado al enviar el correo.
                                 }
                             }
                         }
-
-                        // Se actualiza el estado de la UI para mostrar el mensaje de éxito o error correspondiente.
-                        _appUiState.update { currentState ->
-                            currentState.copy(
-                                showMessage = true,
-                                messageText = errorMessage,
-                            )
-                        }
                     }
+                }
             }
         }
     }
@@ -307,7 +311,7 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         }
     }
 
-    fun onSearch(searchType: String) {
+    fun search(searchType: String) {
         // COMENTARIO.
         viewModelScope.launch {
             when(searchType.lowercase()) {
@@ -329,81 +333,7 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
     }
 
     /** Funciones Add Recipe **/
-    fun onRecipeTitleChanged(recipeTitle: String) {
-        // COMENTARIO.
-        _appUiState.update { currentState ->
-            currentState.copy(recipe = currentState.recipe.copy(title = recipeTitle))
-        }
-    }
-
-    fun onMutableListChanged(
-        newValue: String,
-        index: Int,
-        list: ArrayList<String>,
-        listName: String
-    ) {
-        // Crear una copia de la lista en forma de ArrayList.
-        val updatedList = ArrayList(list)
-        updatedList[index] = newValue
-
-        // Actualizar el estado de la UI con la lista modificada.
-        _appUiState.value = when (listName) {
-            "Ingredient" -> appUiState.value.copy(
-                recipe = appUiState.value.recipe.copy(ingredients = updatedList)
-            )
-            "Instruction" -> appUiState.value.copy(
-                recipe = appUiState.value.recipe.copy(instructions = updatedList)
-            )
-            else -> throw IllegalArgumentException("El nombre de la lista '$listName' no es válido.")
-        }
-    }
-
-
-    fun onMutableListAddElement(
-        list: ArrayList<String>,
-        listName: String
-    ) {
-        // Crear una copia de la lista en forma de ArrayList.
-        val updatedList = ArrayList(list)
-        updatedList.add("")
-
-        // COMENTARIO.
-        _appUiState.value = when (listName) {
-            "Ingredient" -> appUiState.value.copy(
-                recipe = appUiState.value.recipe.copy(ingredients = updatedList)
-            )
-            "Instruction" -> appUiState.value.copy(
-                recipe = appUiState.value.recipe.copy(instructions = updatedList)
-            )
-            else -> throw IllegalArgumentException("El nombre de la lista '$listName' no es válido.")
-        }
-    }
-
-    fun onRecipeIntChanged(
-        newValue: Int,
-        valueName: String
-    ) {
-        // Se obtiene el estado actual de la UI.
-        val currentState = appUiState.value
-
-        // Se actualiza el estado dependiendo del campo que se esté modificando dentro del usuario.
-        val updatedState = when (valueName) {
-            "prepHour" -> currentState.copy(prepHour = newValue)
-            "prepMin" -> currentState.copy(prepMin = newValue)
-            "cookHour" -> currentState.copy(cookHour = newValue)
-            "cookMin" -> currentState.copy(cookMin = newValue)
-            "servings" -> currentState.copy(servings = newValue)
-            else -> currentState.copy(
-                messageText = "Error inesperado en AddRecipeScreen ($valueName)",
-                showMessage = true
-            )
-        }
-
-        // Se actualiza el estado de la página RegisterScreen.
-        _appUiState.update { updatedState }
-    }
-
-    fun onSaveRecipe(
+    fun saveRecipe(
         context: Context,
         action: String,
         callback: (Boolean) -> Unit
@@ -471,7 +401,7 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         }
     }
 
-    fun onChangeView(
+    fun changeView(
         view: String,
     ) {
         viewModelScope.launch {
@@ -505,16 +435,6 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
 
 
     /** Funciones SettingsScreen **/
-    fun resetUserValues() {
-        // Se reiniciar los datos del usuario.
-        val user = Users()
-        _appUiState.update { currentState ->
-            currentState.copy(
-                user = user,
-            )
-        }
-    }
-
     fun onChangeSettingsScreen(newList: List<SettingOption>) {
         _appUiState.update { currentState ->
             currentState.copy(settingsOptions = newList) // TODO: Arreglar
@@ -535,21 +455,6 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
                 recipe = Recipes(),
                 recipes = arrayListOf(),
                 favorites = arrayListOf(),
-            )
-        }
-    }
-
-    fun resetRecipeValues() {
-        // Se reiniciar los datos del usuario.
-        val recipe = Recipes()
-        _appUiState.update { currentState ->
-            currentState.copy(
-                recipe = recipe,
-                prepHour = 0,
-                prepMin = 0,
-                cookHour = 0,
-                cookMin = 0,
-                servings = 0
             )
         }
     }

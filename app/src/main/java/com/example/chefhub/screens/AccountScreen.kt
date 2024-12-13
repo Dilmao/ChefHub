@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.chefhub.R
@@ -141,7 +140,7 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
             // COMENTARIO.
             InvisibleButton(
                 texto = "Mis recetas",
-                onClick = { appViewModel.onChangeView("recipes") }
+                onClick = { appViewModel.changeView("recipes") }
             )
 
             // COMENTARIO.
@@ -150,7 +149,7 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
             // COMENTARIO.
             InvisibleButton(
                 texto = "Guardadas",
-                onClick = { appViewModel.onChangeView("saved") }
+                onClick = { appViewModel.changeView("saved") }
             )
 
             // COMENTARIO.

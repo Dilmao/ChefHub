@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +35,7 @@ import androidx.navigation.NavController
 import com.example.chefhub.R
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.scaffold.MyMainBottomBar
+import com.example.chefhub.screens.components.ContentAlert
 import com.example.chefhub.screens.components.FollowButton
 import com.example.chefhub.screens.components.InvisibleButton
 import com.example.chefhub.screens.components.RecipeCard
@@ -44,6 +43,10 @@ import com.example.chefhub.ui.AppViewModel
 
 @Composable
 fun ViewedUserScreen(navController: NavController, appViewModel: AppViewModel) {
+    /* TODO:
+    *   Funcionalidad del boton Recetas, muestra las recetas del usaurio.
+    *   Mover el boton 'siguiendo'/'seguir' para que este en el mismo row que el nombre de usuario.
+    */
     // COMENTARIO.
     val appUiState by appViewModel.appUiState.collectAsState()
 
@@ -69,7 +72,9 @@ fun ViewedUserScreenContent(navController: NavController, appViewModel: AppViewM
     // COMENTARIO.
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
     var isFollowing by remember { mutableStateOf(false) }
+
     appUiState.following.forEach { user ->
         if (user.userId == appUiState.viewedUser.userId) {
             isFollowing = true
@@ -100,13 +105,22 @@ fun ViewedUserScreenContent(navController: NavController, appViewModel: AppViewM
             )
 
             // COMENTARIO.
-            Text("0\nRecetas", textAlign = TextAlign.Center)
+            InvisibleButton(
+                texto = "${appUiState.recipes.size}\nSeguidos",
+                onClick = { showDialog = true }
+            )
 
             // COMENTARIO.
-            Text("0\nSeguidores", textAlign = TextAlign.Center)
+            InvisibleButton(
+                texto = "${appUiState.followers.size}\nSeguidos",
+                onClick = { showDialog = true }
+            )
 
             // COMENTARIO.
-            Text("0\nSeguidos", textAlign = TextAlign.Center)
+            InvisibleButton(
+                texto = "${appUiState.following.size}\nSeguidos",
+                onClick = { showDialog = true }
+            )
         }
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -144,27 +158,27 @@ fun ViewedUserScreenContent(navController: NavController, appViewModel: AppViewM
         ) {
             // COMENTARIO.
             InvisibleButton(
-                texto = "Mis recetas",
-                onClick = { appViewModel.onChangeView("recipes") }
+                texto = "Recetas",
+                onClick = { appViewModel.changeView("recipes") }
             )
 
             // COMENTARIO.
-            Text("|")
-
-            // COMENTARIO.
-            InvisibleButton(
-                texto = "Guardadas",
-                onClick = { appViewModel.onChangeView("saved") }
-            )
-
-            // COMENTARIO.
-            Text("|")
-
-            // COMENTARIO.
-            InvisibleButton(
-                texto = "¿ALGO?",
-                onClick = { appViewModel.onChangeView("something") }
-            )
+//            Text("|")
+//
+//            // COMENTARIO.
+//            InvisibleButton(
+//                texto = "Guardadas",
+//                onClick = { appViewModel.changeView("saved") }
+//            )
+//
+//            // COMENTARIO.
+//            Text("|")
+//
+//            // COMENTARIO.
+//            InvisibleButton(
+//                texto = "¿ALGO?",
+//                onClick = { appViewModel.changeView("something") }
+//            )
         }
 
         // COMENTARIO.
@@ -185,5 +199,11 @@ fun ViewedUserScreenContent(navController: NavController, appViewModel: AppViewM
                 )
             }
         }
+    }
+
+    if (showDialog) {
+        ContentAlert(
+            onDismissRequest = { showDialog = false }
+        )
     }
 }

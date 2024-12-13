@@ -7,12 +7,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,35 +23,26 @@ import com.example.chefhub.screens.components.ClickableText
 import com.example.chefhub.screens.components.PasswordTextField
 import com.example.chefhub.screens.components.SimpleButton
 import com.example.chefhub.screens.components.SimpleTextField
+import com.example.chefhub.screens.components.saveCredentials
 import com.example.chefhub.screens.components.showMessage
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
 fun RegisterScreen(navController: NavHostController, appViewModel: AppViewModel) {
-    // Estructura principal de la pantalla de registro.
-    Scaffold(
-        topBar = {}
-    ) {paddingValues ->
-        // Caja que ocupa el tamaño disponible aplicando un padding.
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // Contenido del cuerpo de la pantalla de inicio de sesión.
-            RegisterScreenBodyContent(navController, appViewModel)
-        }
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Contenido principal de RegisterScreen.
+        RegisterContent(navController, appViewModel)
     }
 }
 
 @Composable
-fun RegisterScreenBodyContent(navController: NavHostController, appViewModel: AppViewModel) {
+fun RegisterContent(navController: NavHostController, appViewModel: AppViewModel) {
     // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
-    var confirmPassword by rememberSaveable { mutableStateOf("") } // TODO: Borrar el estado al terminar
+    var confirmPassword by remember { mutableStateOf("") }
 
-    // Estructura en columna para alinear los elementos.
+    // Diseño de la pantalla.
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -60,34 +50,34 @@ fun RegisterScreenBodyContent(navController: NavHostController, appViewModel: Ap
             .fillMaxSize()
             .padding(20.dp)
     ) {
-        // Campo de texto para ingresar el nuevo nombre de usuario.
+        // Campo para el nombre de usaurio.
         SimpleTextField(
             value = appUiState.user.userName,
-            onValueChange = { appViewModel.onRegisterChanged(it, "userName") },
+            onValueChange = { appViewModel.onUserChanged(it, "userName") },
             label = "Usuario",
             required = true
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Campo de texto para ingresar el nuevo correo electrónico.
+        // Campo para el correo electrónico.
         SimpleTextField(
             value = appUiState.user.email,
-            onValueChange = { appViewModel.onRegisterChanged(it, "email") },
+            onValueChange = { appViewModel.onUserChanged(it, "email") },
             label = "Correo electrónico",
             required = true
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Campo de texto para ingresar la nueva contraseña.
+        // Campo para la contraseña.
         PasswordTextField(
             value = appUiState.user.password,
-            onValueChange = { appViewModel.onRegisterChanged(it, "password") },
+            onValueChange = { appViewModel.onUserChanged(it, "password") },
             label = "Contraseña",
             required = true
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Campo de texto para confirmar la nueva contraseña.
+        // Campo para confirmar la contraseña.
         PasswordTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
@@ -96,20 +86,28 @@ fun RegisterScreenBodyContent(navController: NavHostController, appViewModel: Ap
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Botón para registrar la nueva cuenta.
+        // Botón de registro.
         SimpleButton(
             texto = "Registrarse",
             onClick = {
-                if (appUiState.user.password.equals(confirmPassword)) {
-                    appViewModel.checkRegister(context) { registerSuccesful ->
-                        if (registerSuccesful) {
+                // Se valida y procesa el registro.
+                appViewModel.checkRegister(confirmPassword) { validation ->
+                    when (validation) {
+                        1 -> showMessage(context, "Uno o más campos están vacíos.")
+                        2 -> showMessage(context, "El correo debe contener un @.")
+                        3 -> showMessage(context, "La contraseña debe contener entre 10 y 30 carácteres..")
+                        4 -> showMessage(context, "Ambas contraseñas deben ser iguales.")
+                        5 -> showMessage(context, "El correo electrónico ya está registrado.")
+                        6 -> showMessage(context, "El nombre introducido ya está en uso.")
+                        7 -> showMessage(context, "Error inesperado. Por favor, contacte con soporte técnico.")
+                        else -> {
+                            saveCredentials(context, appUiState.user.email, appUiState.user.password)
+                            showMessage(context, "Nuevo usuario creado con éxito.")
                             navController.navigate(AppScreens.MainScreen.route)
                         }
                     }
-                } else {
-                    showMessage(context, "Ambas contraseñas deben ser iguales")
                 }
-            },
+            }
         )
         Spacer(modifier = Modifier.height(20.dp))
 

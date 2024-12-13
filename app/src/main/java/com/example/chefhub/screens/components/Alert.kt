@@ -13,17 +13,32 @@ fun ContentAlert(
     onDismissRequest: () -> Unit
 ) {
     AlertDialog(
+        title = { Text(title, style = MaterialTheme.typography.titleMedium) },
+        text = { Text(message, style = MaterialTheme.typography.bodyMedium) },
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(onClick = onDismissRequest) {
                 Text("Aceptar", style = TextStyle(fontSize = 16.sp))
             }
         },
-        title = {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-        },
-        text = {
-            Text(message, style = MaterialTheme.typography.bodyMedium)
+        tonalElevation = 4.dp
+    )
+}
+
+@Composable
+fun PasswordRecoveryAlert(
+    title: String = "Reestablecer contraseña",
+    message: String,
+    onDismissRequest: () -> Unit
+) {
+    AlertDialog(
+        title = { Text(title, style = MaterialTheme.typography.titleMedium) },
+        text = { Text(message, style = MaterialTheme.typography.bodyMedium) },
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text("Aceptar", style = TextStyle(fontSize = 16.sp))
+            }
         },
         tonalElevation = 4.dp
     )

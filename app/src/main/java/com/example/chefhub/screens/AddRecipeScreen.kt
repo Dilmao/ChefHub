@@ -76,7 +76,7 @@ fun AddRecipeScreenContent(navController: NavController, appViewModel: AppViewMo
         item {
             SimpleTextField(
                 value = appUiState.recipe.title,
-                onValueChange = { appViewModel.onRecipeTitleChanged(it) },
+                onValueChange = { appViewModel.onRecipeChanged(it, "title") },
                 label = "Nombre",
                 required = true
             )
@@ -136,9 +136,9 @@ fun AddRecipeScreenContent(navController: NavController, appViewModel: AppViewMo
                 value = appUiState.prepHour.toString(),
                 onValueChange = {
                     if (it.toIntOrNull() != null) {
-                        appViewModel.onRecipeIntChanged(it.toInt(), "prepHour")
+                        appViewModel.onRecipeChanged(it.toInt(), "prepHour")
                     } else {
-                        appViewModel.onRecipeIntChanged(0, "prepHour")
+                        appViewModel.onRecipeChanged(0, "prepHour")
                     }
                 },
                 label = "Hora/s"
@@ -150,9 +150,9 @@ fun AddRecipeScreenContent(navController: NavController, appViewModel: AppViewMo
                 value = appUiState.prepMin.toString(),
                 onValueChange = {
                     if (it.toIntOrNull() != null) {
-                        appViewModel.onRecipeIntChanged(it.toInt(), "prepMin")
+                        appViewModel.onRecipeChanged(it.toInt(), "prepMin")
                     } else {
-                        appViewModel.onRecipeIntChanged(0, "prepMin")
+                        appViewModel.onRecipeChanged(0, "prepMin")
                     }
                 },
                 label = "Minuto/s"
@@ -168,9 +168,9 @@ fun AddRecipeScreenContent(navController: NavController, appViewModel: AppViewMo
                 value = appUiState.cookHour.toString(),
                 onValueChange = {
                     if (it.toIntOrNull() != null) {
-                        appViewModel.onRecipeIntChanged(it.toInt(), "cookHour")
+                        appViewModel.onRecipeChanged(it.toInt(), "cookHour")
                     } else {
-                        appViewModel.onRecipeIntChanged(0, "cookHour")
+                        appViewModel.onRecipeChanged(0, "cookHour")
                     }
                 },
                 label = "Hora/s"
@@ -182,9 +182,9 @@ fun AddRecipeScreenContent(navController: NavController, appViewModel: AppViewMo
                 value = appUiState.cookMin.toString(),
                 onValueChange = {
                     if (it.toIntOrNull() != null) {
-                        appViewModel.onRecipeIntChanged(it.toInt(), "cookMin")
+                        appViewModel.onRecipeChanged(it.toInt(), "cookMin")
                     } else {
-                        appViewModel.onRecipeIntChanged(0, "cookMin")
+                        appViewModel.onRecipeChanged(0, "cookMin")
                     }
                 },
                 label = "Minuto/s"
@@ -199,9 +199,9 @@ fun AddRecipeScreenContent(navController: NavController, appViewModel: AppViewMo
                 value = appUiState.servings.toString(),
                 onValueChange = {
                     if (it.toIntOrNull() != null) {
-                        appViewModel.onRecipeIntChanged(it.toInt(), "servings")
+                        appViewModel.onRecipeChanged(it.toInt(), "servings")
                     } else {
-                        appViewModel.onRecipeIntChanged(0, "servings")
+                        appViewModel.onRecipeChanged(0, "servings")
                     }
                 },
                 label = "Hora/s"
@@ -220,7 +220,7 @@ fun AddRecipeScreenContent(navController: NavController, appViewModel: AppViewMo
     ) {
         // Botón para guardar la receta.
         Button(onClick = {
-            appViewModel.onSaveRecipe(context, "create") { createSuccesfull ->
+            appViewModel.saveRecipe(context, "create") { createSuccesfull ->
                 if (createSuccesfull) {
                     navController.navigate(AppScreens.AccountScreen.route)
                 }

@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,7 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -32,51 +29,42 @@ import com.example.chefhub.screens.components.PasswordTextField
 import com.example.chefhub.screens.components.SimpleButton
 import com.example.chefhub.screens.components.SimpleTextField
 import com.example.chefhub.screens.components.loadCredentials
+import com.example.chefhub.screens.components.saveCredentials
+import com.example.chefhub.screens.components.showMessage
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
 fun LoginScreen(navController: NavHostController, appViewModel: AppViewModel) {
-    // Estructura principal de la pantalla de login.
-    Scaffold(
-        topBar = {}
-    ) {paddingValues ->
-        // Caja que ocupa el tamaño disponible aplicando un padding.
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // Contenido del cuerpo de la pantalla de inicio de sesión.
-            LoginScreenBodyContent(navController, appViewModel)
-        }
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Contenido principal de LoginScreen.
+        LoginContent(navController, appViewModel)
     }
 }
 
 @Composable
-fun LoginScreenBodyContent(navController: NavHostController, appViewModel: AppViewModel) {
+fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
     // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
     var loadedCredentials by remember { mutableStateOf(false) }
 
-    // Se intentan cargar las credenciales guardadas.
+    // Se cargan las credenciales guardadas.
     if (!loadedCredentials) {
         val (savedEmail, savedPassword) = loadCredentials(context)
         if (savedEmail != null && savedPassword != null) {
-            appViewModel.onLoginChanged(savedEmail, savedPassword)
-            loadedCredentials = true
+            appViewModel.onUserChanged(savedEmail, "email")
+            appViewModel.onUserChanged(savedPassword, "password")
         }
+        loadedCredentials = true
     }
 
-    // Estructura en columna para alinear los elementos.
+    // Diseño de la pantalla.
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
+        modifier = Modifier.fillMaxSize().padding(20.dp)
     ) {
-        // COMENTARIO.
+        // Logo de ChefHub.
         Image(
             painter = painterResource(id = R.drawable.logo_no_bg),
             contentDescription = "Logo",
@@ -85,40 +73,47 @@ fun LoginScreenBodyContent(navController: NavHostController, appViewModel: AppVi
         )
         Spacer(modifier = Modifier.height(40.dp))
 
-
-        // Campo de texto para ingresas el correo electrónico del usuario.
+        // Campo para el correo electrónico.
         SimpleTextField(
             value = appUiState.user.email,
-            onValueChange = { appViewModel.onLoginChanged(it, appUiState.user.password) },
+            onValueChange = { appViewModel.onUserChanged(it, "email") },
             label = "Correo electrónico",
             required = true
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Campo de texto para ingresas la contraseña del usuario.
+        // Campo para la contraseña.
         PasswordTextField(
             value = appUiState.user.password,
-            onValueChange = { appViewModel.onLoginChanged(appUiState.user.email, it) },
+            onValueChange = { appViewModel.onUserChanged(it, "password") },
             label = "Contraseña",
             required = true
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Botón para iniciar sesión.
+        // Botón de inicio de sesión.
         SimpleButton(
             texto = "Iniciar sesión",
             onClick = {
-                appViewModel.checkLogin(context) { loginSuccessful ->
-                if (loginSuccessful) {
-                    appViewModel.resetUserValues()
-                    navController.navigate(AppScreens.MainScreen.route)
+                // Se valida y procesa el inicio de sesión.
+                appViewModel.checkLogin { validation ->
+                    when (validation) {
+                        1 -> showMessage(context, "Uno o más campos están vacíos.")
+                        2 -> showMessage(context, "Correo y/o contraseña incorrectos.")
+                        3 -> showMessage(context, "Usuario autenticado, pero no encontrado localmente.")
+                        4 -> showMessage(context, "Error inesperado. Por favor, contacte con soporte técnico.")
+                        else -> {
+                            saveCredentials(context, appUiState.user.email, appUiState.user.password)
+                            showMessage(context, "Inicio de sesión exitoso.")
+                            navController.navigate(AppScreens.MainScreen.route)
+                        }
+                    }
                 }
             }
-                      },
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Textos clicables para registrarse o recuperar la contraseña.
+        // Textos clicables para registrarse.
         ClickableText(
             mensaje = "¿No tienes una cuenta? ",
             enlace = "Registrarse",
@@ -127,6 +122,8 @@ fun LoginScreenBodyContent(navController: NavHostController, appViewModel: AppVi
                 navController.navigate(AppScreens.RegisterScreen.route)
             }
         )
+
+        // Texto clicable para recuperar contraseña.
         ClickableText(
             mensaje = "¿Has olvidado tu contraseña?  ",
             enlace = "Ayuda",

@@ -17,9 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -70,7 +67,7 @@ fun ModifyRecipeScreenContent(navController: NavController, appViewModel: AppVie
         item {
             SimpleTextField(
                 value = appUiState.recipe.title,
-                onValueChange = { appViewModel.onRecipeTitleChanged(it) },
+                onValueChange = { appViewModel.onRecipeChanged(it, "title") },
                 label = "Nombre",
                 required = true
             )
@@ -130,9 +127,9 @@ fun ModifyRecipeScreenContent(navController: NavController, appViewModel: AppVie
                 value = appUiState.prepHour.toString(),
                 onValueChange = {
                     if (it.toIntOrNull() != null) {
-                        appViewModel.onRecipeIntChanged(it.toInt(), "prepHour")
+                        appViewModel.onRecipeChanged(it.toInt(), "prepHour")
                     } else {
-                        appViewModel.onRecipeIntChanged(0, "prepHour")
+                        appViewModel.onRecipeChanged(0, "prepHour")
                     }
                 },
                 label = "Hora/s"
@@ -144,9 +141,9 @@ fun ModifyRecipeScreenContent(navController: NavController, appViewModel: AppVie
                 value = appUiState.prepMin.toString(),
                 onValueChange = {
                     if (it.toIntOrNull() != null) {
-                        appViewModel.onRecipeIntChanged(it.toInt(), "prepMin")
+                        appViewModel.onRecipeChanged(it.toInt(), "prepMin")
                     } else {
-                        appViewModel.onRecipeIntChanged(0, "prepMin")
+                        appViewModel.onRecipeChanged(0, "prepMin")
                     }
                 },
                 label = "Minuto/s"
@@ -162,9 +159,9 @@ fun ModifyRecipeScreenContent(navController: NavController, appViewModel: AppVie
                 value = appUiState.cookHour.toString(),
                 onValueChange = {
                     if (it.toIntOrNull() != null) {
-                        appViewModel.onRecipeIntChanged(it.toInt(), "cookHour")
+                        appViewModel.onRecipeChanged(it.toInt(), "cookHour")
                     } else {
-                        appViewModel.onRecipeIntChanged(0, "cookHour")
+                        appViewModel.onRecipeChanged(0, "cookHour")
                     }
                 },
                 label = "Hora/s"
@@ -176,9 +173,9 @@ fun ModifyRecipeScreenContent(navController: NavController, appViewModel: AppVie
                 value = appUiState.cookMin.toString(),
                 onValueChange = {
                     if (it.toIntOrNull() != null) {
-                        appViewModel.onRecipeIntChanged(it.toInt(), "cookMin")
+                        appViewModel.onRecipeChanged(it.toInt(), "cookMin")
                     } else {
-                        appViewModel.onRecipeIntChanged(0, "cookMin")
+                        appViewModel.onRecipeChanged(0, "cookMin")
                     }
                 },
                 label = "Minuto/s"
@@ -193,9 +190,9 @@ fun ModifyRecipeScreenContent(navController: NavController, appViewModel: AppVie
                 value = appUiState.servings.toString(),
                 onValueChange = {
                     if (it.toIntOrNull() != null) {
-                        appViewModel.onRecipeIntChanged(it.toInt(), "servings")
+                        appViewModel.onRecipeChanged(it.toInt(), "servings")
                     } else {
-                        appViewModel.onRecipeIntChanged(0, "servings")
+                        appViewModel.onRecipeChanged(0, "servings")
                     }
                 },
                 label = "Hora/s"
@@ -214,7 +211,7 @@ fun ModifyRecipeScreenContent(navController: NavController, appViewModel: AppVie
     ) {
         // Botón para guardar la receta.
         Button(onClick = {
-            appViewModel.onSaveRecipe(context, "save") { saveSuccesfull ->
+            appViewModel.saveRecipe(context, "save") { saveSuccesfull ->
                 if (saveSuccesfull) {
                     navController.navigate(AppScreens.LoginScreen.route)
                 }
