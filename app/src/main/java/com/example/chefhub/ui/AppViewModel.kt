@@ -14,6 +14,8 @@ import com.example.chefhub.screens.components.showMessage
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -168,7 +170,7 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
             if (email.isEmpty() || password.isEmpty()) {
                 callback(1) // 1: Campos están vacíos.
             } else if (database.usersDao.getUserByEmail(email) == null) {
-                callback(3) // 3: Usuario no encontrado en SQLite.
+                callback(2) // 2: Usuario no encontrado en SQLite.
             } else {
                 auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -184,14 +186,18 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
                                     callback(0) // 0: Inicio de sesión exitoso.
                                 }
                             } catch (e: Exception) {
-                                callback(4) // 4: Error al sincronizar datos del usuario.
+                                callback(4) // 5: Error inesperado.
                             }
                         }
                     } else {
-                        callback(2) // Correo y/o contraseña incorrectos.
+                        when (val exception = task.exception) {
+                            is FirebaseAuthInvalidUserException -> callback(2) // 2: Correo no encotrado en Firebase.
+                            is FirebaseAuthInvalidCredentialsException -> callback(3) // 3: Contraseña incorrecta.
+                            else -> callback(4) // 5: Error inesperado.
+                        }
                     }
                 }
-        }
+            }
         }
     }
 

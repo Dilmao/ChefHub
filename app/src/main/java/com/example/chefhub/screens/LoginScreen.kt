@@ -41,6 +41,11 @@ fun LoginScreen(navController: NavHostController, appViewModel: AppViewModel) {
     }
 }
 
+/*
+  * TODO:
+  *  1. Iniciar sesión automaticamente si se tienen las credenciales guardadas, al cerrar sesion se tendra que venir a esta pagina, pero sin intentar iniciar sesión.
+  *  2. Cada vez que se falla al iniciar sesión, aumentar en 1 el numero de intentos fallidos, al llegar a 3 cerrar la app.
+*/
 @Composable
 fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
     // Se obtiene el contexto y el estado de la UI.
@@ -99,8 +104,8 @@ fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
                 appViewModel.checkLogin { validation ->
                     when (validation) {
                         1 -> showMessage(context, "Uno o más campos están vacíos.")
-                        2 -> showMessage(context, "Correo y/o contraseña incorrectos.")
-                        3 -> showMessage(context, "Usuario autenticado, pero no encontrado localmente.")
+                        2 -> showMessage(context, "Usuario introducido no encontrado.")
+                        3 -> showMessage(context, "Contraseña equivocada, 3 intentos restantes.")
                         4 -> showMessage(context, "Error inesperado. Por favor, contacte con soporte técnico.")
                         else -> {
                             saveCredentials(context, appUiState.user.email, appUiState.user.password)
