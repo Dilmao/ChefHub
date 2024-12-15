@@ -104,7 +104,7 @@ fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
                 appViewModel.checkLogin { validation ->
                     when (validation) {
                         1 -> showMessage(context, "Uno o más campos están vacíos.")
-                        2 -> showMessage(context, "Usuario introducido no encontrado.")
+                        2 -> showMessage(context, "Correo introducido no encontrado en DB.")
                         3 -> showMessage(context, "Contraseña equivocada, 3 intentos restantes.")
                         4 -> showMessage(context, "Error inesperado. Por favor, contacte con soporte técnico.")
                         else -> {
