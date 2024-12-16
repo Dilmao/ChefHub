@@ -111,7 +111,10 @@ fun PasswordRecoveryContent(navController: NavHostController, appViewModel: AppV
     if (showDialog) {
         PasswordRecoveryAlert(
             message = "Se ha enviado un correo electrónico a la dirección: \"${appUiState.user.email}\".\n Siga las instrucciones en el correo para cambiar la contraseña.",
-            onDismissRequest = { showDialog = false }
+            onDismissRequest = {
+                showDialog = false
+                navController.navigate(AppScreens.LoginScreen.route)
+            }
         )
     }
 }

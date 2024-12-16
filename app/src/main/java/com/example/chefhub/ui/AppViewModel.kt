@@ -269,7 +269,7 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         viewModelScope.launch {
             if (email.isEmpty()) {
                 callback(1) // 1: Campo 'correo' vacío.
-            } else if (database.usersDao.getUserByEmail(email) != null) {
+            } else if (database.usersDao.getUserByEmail(email) == null) {
                 callback(2) // 2: Usuario no encontrado en SQLite.
             } else {
                 // Se envia un correo para restablecer la contraseña.
