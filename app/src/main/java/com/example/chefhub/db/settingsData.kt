@@ -81,6 +81,13 @@ private val accountOptions = listOf(
             navController.navigate(AppScreens.LoginScreen.route)
         }
     ),
+    SettingOption(
+        title = "Borrar cuenta",
+        onClickAction = { appViewModel, _, navController ->
+            appViewModel.deleteAccount()
+            navController.navigate(AppScreens.LoginScreen.route)
+        }
+    ),
 )
 
 private val notificationOptions = listOf(

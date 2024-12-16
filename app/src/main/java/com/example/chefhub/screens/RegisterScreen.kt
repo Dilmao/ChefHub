@@ -109,7 +109,7 @@ fun RegisterContent(navController: NavHostController, appViewModel: AppViewModel
                     when (validation) {
                         1 -> showMessage(context, "Uno o más campos están vacíos.")
                         2 -> showMessage(context, "El correo debe contener un @.")
-                        3 -> showMessage(context, "La contraseña debe contener entre 10 y 30 caráctere.")
+                        3 -> showMessage(context, "La contraseña debe contener entre 10 y 30 caractere.")
                         4 -> showMessage(context, "Ambas contraseñas deben ser iguales.")
                         5 -> showMessage(context, "El correo electrónico ya está registrado.")
                         6 -> showMessage(context, "El nombre introducido ya está en uso.")

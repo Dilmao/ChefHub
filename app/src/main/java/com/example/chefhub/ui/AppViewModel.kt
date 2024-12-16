@@ -465,6 +465,31 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         }
     }
 
+    fun deleteAccount() {
+        // COMENTARIO.
+        val auth: FirebaseAuth = Firebase.auth
+        val user = appUiState.value.user
+
+        // COMENTARIO.
+        viewModelScope.launch {
+            auth.signOut()
+            database.usersDao.deleteUser(user)
+
+            _appUiState.update { currentState ->
+                currentState.copy(
+                    user = Users(),
+                    viewedUser = Users(),
+                    users = arrayListOf(),
+                    followers = arrayListOf(),
+                    following = arrayListOf(),
+                    recipe = Recipes(),
+                    recipes = arrayListOf(),
+                    favorites = arrayListOf(),
+                )
+            }
+        }
+    }
+
     /** Funciones Database **/
     fun onSelectUser(user: Users) {
         viewModelScope.launch {
