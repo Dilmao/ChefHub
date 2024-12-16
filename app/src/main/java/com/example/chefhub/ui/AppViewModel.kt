@@ -219,9 +219,9 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
                 callback(3) // 3: La contraseña tiene un tamaño inválido.
             } else if(!newPassword.equals(confirmPassword)) {
                 callback(4) // 4: Contraseña y confirmación no coindicen.
-            } else if(newEmail.equals(database.usersDao.getUserByEmail(newEmail)?.email)) {
+            } else if(database.usersDao.getUserByEmail(newEmail) != null) {
                 callback(5) // 5: El correo ya existe en SQLite.
-            } else if(newUserName.equals(database.usersDao.getUserByUserName(newUserName)?.userName)) {
+            } else if(database.usersDao.getUserByUserName(newUserName) != null) {
                 callback(6) // 6: El nombre ya existe en SQLite.
             } else {
                 // Se registra el usuario en Firebase.
@@ -267,7 +267,7 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         viewModelScope.launch {
             if (email.isEmpty()) {
                 callback(1) // 1: Campo 'correo' vacío.
-            } else if (!email.equals(database.usersDao.getUserByEmail(email)?.email)) {
+            } else if (database.usersDao.getUserByEmail(email) != null) {
                 callback(2) // 2: Usuario no encontrado en SQLite.
             } else {
                 // Se envia un correo para restablecer la contraseña.
