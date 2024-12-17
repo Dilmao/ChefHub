@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.scaffold.MyMainBottomBar
+import com.example.chefhub.scaffold.MyMainTopBar
 import com.example.chefhub.screens.components.RecipeCard
 import com.example.chefhub.ui.AppViewModel
 
@@ -33,7 +34,7 @@ import com.example.chefhub.ui.AppViewModel
 fun MainScreen(navController: NavHostController, appViewModel: AppViewModel) {
     // COMENTARIO.
     Scaffold(
-        topBar = {},
+        topBar = { MyMainTopBar() },
         bottomBar = { MyMainBottomBar("Main", navController) }
     ) {paddingValues ->
         // COMENTARIO.
