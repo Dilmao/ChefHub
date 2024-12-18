@@ -24,11 +24,11 @@ interface RecipesDao {
     suspend fun deleteRecipe(recipes: Recipes)
 
     // Obtiene todas las recetas ordenadas por título
-    @Query("SELECT * FROM recipes ORDER BY title ASC")
+    @Query("SELECT * FROM recipes ORDER BY createdAt DESC")
     fun getRecipes(): Flow<List<Recipes>>
 
     // Obtiene todas las recetas asociadas a un usuario específico
-    @Query("SELECT * FROM recipes WHERE userId = :userId ORDER BY title ASC")
+    @Query("SELECT * FROM recipes WHERE userId = :userId ORDER BY createdAt DESC")
     fun getRecipesByUser(userId: Int): Flow<List<Recipes>>
 
     // Obtiene recetas subidas por una lista de usuarios seguidos, ordenadas por fecha de publicación.

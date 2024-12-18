@@ -27,14 +27,14 @@ val settingOptions = listOf(
         }
     ),
     SettingOption(
-        title = "Privacidad de la cuenta",
+        title = "Privacidad",
         onClickAction = { appViewModel, _, navController ->
             appViewModel.onChangeSettingsScreen(privacyOptions)
             navController.navigate(AppScreens.SettingsScreen.route)
         }
     ),
     SettingOption(
-        title = "Comentarios",
+        title = "Comentarios y Soporte",
         onClickAction = { appViewModel, _, navController ->
             appViewModel.onChangeSettingsScreen(commentsOptions)
             navController.navigate(AppScreens.SettingsScreen.route)
@@ -68,10 +68,6 @@ private val accountOptions = listOf(
     ),
     SettingOption(
         title = "Cambiar foto de perfil",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
-    ),
-    SettingOption(
-        title = "Crear una nueva cuenta",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
     SettingOption(
@@ -109,6 +105,10 @@ private val commentsOptions = listOf(
         title = "Ver comentarios",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
+    SettingOption(
+        title = "Contacto con soporte",
+        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
+    ),
 )
 
 private val accesibilityOptions = listOf(
@@ -118,6 +118,11 @@ private val accesibilityOptions = listOf(
     ),
     SettingOption(
         title = "Cambiar de idioma",
+        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
+    ),
+
+    SettingOption(
+        title = "Tamaño de fuente",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
 )
