@@ -32,6 +32,7 @@ import com.example.chefhub.screens.components.loadCredentials
 import com.example.chefhub.screens.components.saveCredentials
 import com.example.chefhub.screens.components.showMessage
 import com.example.chefhub.ui.AppViewModel
+import kotlin.system.exitProcess
 
 @Composable
 fun LoginScreen(navController: NavHostController, appViewModel: AppViewModel) {
@@ -43,8 +44,7 @@ fun LoginScreen(navController: NavHostController, appViewModel: AppViewModel) {
 
 /*
   * TODO:
-  *  1. Iniciar sesión automaticamente si se tienen las credenciales guardadas, al cerrar sesion se tendra que venir a esta pagina, pero sin intentar iniciar sesión.
-  *  2. Cada vez que se falla al iniciar sesión, aumentar en 1 el numero de intentos fallidos, al llegar a 3 cerrar la app.
+  *  1. Pedir permisos al iniciar la aplicación (manifest, lineas 10 ~ 13, pedir ayuda a chatGPT).
 */
 @Composable
 fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
@@ -67,7 +67,9 @@ fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize().padding(20.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
     ) {
         // Logo de ChefHub.
         Image(
@@ -105,13 +107,18 @@ fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
                     when (validation) {
                         1 -> showMessage(context, "Uno o más campos están vacíos.")
                         2 -> showMessage(context, "Correo introducido no encontrado en DB.")
-                        3 -> showMessage(context, "Contraseña equivocada, 3 intentos restantes.")
+                        3 -> if (appUiState.tries != 0) showMessage(context, "Contraseña equivocada, ${appUiState.tries} intentos restantes.")
                         4 -> showMessage(context, "Error inesperado. Por favor, contacte con soporte técnico.")
                         else -> {
                             saveCredentials(context, appUiState.user.email, appUiState.user.password)
                             showMessage(context, "Inicio de sesión exitoso.")
                             navController.navigate(AppScreens.MainScreen.route)
                         }
+                    }
+
+                    if (appUiState.tries == 0) {
+                        showMessage(context, "Se agotaron los intentos. La aplicación se cerrará.")
+                        exitProcess(0)
                     }
                 }
             }

@@ -166,6 +166,7 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         val auth: FirebaseAuth = Firebase.auth
         val email = appUiState.value.user.email
         val password = appUiState.value.user.password
+        var tries = appUiState.value.tries
 
         // Validar si los campos están vacíos.
         viewModelScope.launch {
@@ -192,10 +193,17 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
                             }
                         }
                     } else {
-                        when (val exception = task.exception) {
+                        when (task.exception) {
                             is FirebaseAuthInvalidUserException -> callback(2) // 2: Correo no encotrado en Firebase.
-                            is FirebaseAuthInvalidCredentialsException -> callback(3) // 3: Contraseña incorrecta.
+                            is FirebaseAuthInvalidCredentialsException -> {
+                                callback(3)
+                                tries--
+                            } // 3: Contraseña incorrecta.
                             else -> callback(4) // 5: Error inesperado.
+                        }
+
+                        _appUiState.update { currentState ->
+                            currentState.copy(tries = tries)
                         }
                     }
                 }
