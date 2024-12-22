@@ -38,4 +38,7 @@ interface RecipesDao {
         ORDER BY createdAt DESC
     """)
     fun getRecipesByFollowedUsers(followedUsersIds: List<Int>): Flow<List<Recipes>>
+
+    @Query("SELECT * FROM recipes WHERE title LIKE :title ORDER BY title ASC")
+    fun searchRecipesByTitle(title: String): Flow<List<Recipes>>
 }

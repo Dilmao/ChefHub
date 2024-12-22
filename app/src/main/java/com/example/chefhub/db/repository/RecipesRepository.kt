@@ -19,4 +19,7 @@ class RecipesRepository(private val recipesDao: RecipesDao) {
 
     // Obtiene todas las recetas asociadas a un usuario específico
     fun getRecipesByUser(userId: Int): Flow<List<Recipes>> = recipesDao.getRecipesByUser(userId)
+
+    // Obtiene todas las recetas asociadas a un usuario específico
+    fun searchRecipesByTitle(title: String): Flow<List<Recipes>> = recipesDao.searchRecipesByTitle(title)
 }

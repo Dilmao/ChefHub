@@ -18,7 +18,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.chefhub.navigation.AppScreens
@@ -70,7 +69,7 @@ fun SearchScreenContent(navController: NavController, appViewModel: AppViewModel
             SearchField(
                 value = appUiState.search,
                 onValueChange = { appViewModel.onSearchChanged(it) },
-                onSearch= { showDialog = true }
+                onSearch= { appViewModel.search(type) }
             )
         }
 

@@ -22,4 +22,7 @@ class UsersRepository(private val usersDao: UsersDao) {
 
     // Obtiene un usuario por nombre de usuario
     suspend fun getUserByUserName(userName: String): Users? = usersDao.getUserByUserName(userName)
+
+    // Obtiene un usuario por nombre de usuario
+    fun searchUsersByUserName(userName: String): Flow<List<Users>> = usersDao.searchUsersByUserName(userName)
 }

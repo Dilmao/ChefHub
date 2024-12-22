@@ -328,31 +328,36 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
     }
 
     fun search(searchType: String) {
-        // COMENTARIO.
         viewModelScope.launch {
-            when(searchType.lowercase()) {
+            when (searchType.lowercase()) {
                 "users" -> {
-                    val users = database.usersDao.getUsers().firstOrNull() ?: emptyList()
+                    // Busca usuarios cuyo nombre de usuario contenga 'searchItem'
+                    val users = database.usersDao.searchUsersByUserName("%${appUiState.value.search}%").firstOrNull() ?: emptyList()
                     _appUiState.update { currentState ->
                         currentState.copy(users = ArrayList(users.toCollection(mutableListOf())))
                     }
                 }
                 "recipes" -> {
-                    val recipes = database.recipesDao.getRecipes().firstOrNull() ?: emptyList()
+                    // Busca recetas cuyo título contenga 'searchItem'
+                    val recipes = database.recipesDao.searchRecipesByTitle("%${appUiState.value.search}%").firstOrNull() ?: emptyList()
                     _appUiState.update { currentState ->
                         currentState.copy(recipes = ArrayList(recipes.toCollection(mutableListOf())))
                     }
                 }
                 "categories" -> {
-                    val categories = database.categoriesDao.getCategories().firstOrNull() ?: emptyList()
+                    // Busca categorías cuyo nombre contenga 'searchItem'
+                    val categories = database.categoriesDao.searchCategoriesByName("%${appUiState.value.search}%").firstOrNull() ?: emptyList()
                     _appUiState.update { currentState ->
                         currentState.copy(categories = ArrayList(categories.toCollection(mutableListOf())))
                     }
                 }
-                else -> { println("Tipo desconocido: $searchType.") }
+                else -> {
+                    println("Tipo desconocido: $searchType.")
+                }
             }
         }
     }
+
 
     /** Funciones Add Recipe **/
     fun saveRecipe(

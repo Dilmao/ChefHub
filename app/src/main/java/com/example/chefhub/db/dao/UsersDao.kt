@@ -34,4 +34,7 @@ interface UsersDao {
     // COMENTARIO
     @Query("SELECT * FROM users WHERE userName = :userName LIMIT 1")
     suspend fun getUserByUserName(userName: String): Users?
+
+    @Query("SELECT * FROM users WHERE userName LIKE :userName ORDER BY userName ASC")
+    fun searchUsersByUserName(userName: String): Flow<List<Users>>
 }

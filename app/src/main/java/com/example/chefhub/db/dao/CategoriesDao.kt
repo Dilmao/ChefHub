@@ -34,4 +34,7 @@ interface CategoriesDao {
     // Elimina todas las categorías
     @Query("DELETE FROM categories")
     suspend fun deleteAllCategories()
+
+    @Query("SELECT * FROM categories WHERE categoryName LIKE :categoryName ORDER BY categoryName ASC")
+    fun searchCategoriesByName(categoryName: String): Flow<List<Categories>>
 }

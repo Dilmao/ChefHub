@@ -27,4 +27,7 @@ class CategoriesRepository(private val categoriesDao: CategoriesDao) {
     suspend fun categoryExists(categoryName: String): Boolean {
         return categoriesDao.getCategoryByName(categoryName) != null
     }
+
+    // COMENTARIO.
+    fun searchCategoriesByName(categoryName: String): Flow<List<Categories>> = categoriesDao.searchCategoriesByName(categoryName)
 }
