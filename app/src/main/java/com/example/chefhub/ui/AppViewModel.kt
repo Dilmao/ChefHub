@@ -343,6 +343,12 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
                         currentState.copy(recipes = ArrayList(recipes.toCollection(mutableListOf())))
                     }
                 }
+                "categories" -> {
+                    val categories = database.categoriesDao.getCategories().firstOrNull() ?: emptyList()
+                    _appUiState.update { currentState ->
+                        currentState.copy(categories = ArrayList(categories.toCollection(mutableListOf())))
+                    }
+                }
                 else -> { println("Tipo desconocido: $searchType.") }
             }
         }

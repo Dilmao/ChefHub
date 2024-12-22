@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.scaffold.MyMainBottomBar
+import com.example.chefhub.screens.components.CategoryCard
 import com.example.chefhub.screens.components.ContentAlert
 import com.example.chefhub.screens.components.InvisibleButton
 import com.example.chefhub.screens.components.RecipeCard
@@ -37,12 +38,7 @@ fun SearchScreen(navController: NavController, appViewModel: AppViewModel) {
         bottomBar = { MyMainBottomBar("Search", navController) }
     ) { paddingValues ->
         // COMENTARIO.
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // COMENTARIO.
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             SearchScreenContent(navController, appViewModel)
         }
     }
@@ -51,7 +47,6 @@ fun SearchScreen(navController: NavController, appViewModel: AppViewModel) {
 @Composable
 fun SearchScreenContent(navController: NavController, appViewModel: AppViewModel) {
     val appUiState by appViewModel.appUiState.collectAsState()
-    val context = LocalContext.current
     var type by rememberSaveable { mutableStateOf("recipes") }
     var loaded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
@@ -100,8 +95,11 @@ fun SearchScreenContent(navController: NavController, appViewModel: AppViewModel
             )
 
             InvisibleButton(
-                texto = "¿ALGO?",
-                onClick = { showDialog = true }
+                texto = "Categorias",
+                onClick = {
+                    type = "categories"
+                    appViewModel.search(type)
+                }
             )
         }
 
@@ -134,8 +132,15 @@ fun SearchScreenContent(navController: NavController, appViewModel: AppViewModel
                         )
                     }
                 }
-            } else if (type.equals("other")) {
-                // TODO
+            } else if (type.equals("categories")) {
+                items(appUiState.categories.size) { index ->
+                    CategoryCard(
+                        category = appUiState.categories[index],
+                        onClick = {
+                            showDialog = true
+                        }
+                    )
+                }
             }
         }
     }

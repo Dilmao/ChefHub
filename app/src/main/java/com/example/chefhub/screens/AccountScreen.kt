@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -66,7 +65,6 @@ fun AccountScreen(navController: NavController, appViewModel: AppViewModel) {
 fun AccountScreenContent(navController: NavController, appViewModel: AppViewModel) {
     // COMENTARIO.
     val appUiState by appViewModel.appUiState.collectAsState()
-    val context = LocalContext.current
     var loadedRecipes by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
@@ -95,7 +93,7 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
                 contentDescription = "Usuario",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(90.dp)
                     .clip(CircleShape)
             )
 
@@ -127,7 +125,7 @@ fun AccountScreenContent(navController: NavController, appViewModel: AppViewMode
                 .fillMaxWidth()
                 .padding(start = 20.dp)
         ) {
-            Text(appUiState.user.userName)
+            appUiState.user.bio?.let { Text(it) }
         }
         Spacer(modifier = Modifier.height(20.dp))
 

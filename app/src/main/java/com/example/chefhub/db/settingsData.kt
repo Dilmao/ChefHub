@@ -4,13 +4,13 @@ import androidx.navigation.NavHostController
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.ui.AppViewModel
 
-// Data class que acepta una acción que utiliza AppViewModel.x
+// Data class que acepta una acción que utiliza AppViewModel.
 data class SettingOption(
     val title: String,
     val onClickAction: (AppViewModel, () -> Unit, NavHostController) -> Unit
 )
 
-// Definir las opciones de configuración con las acciones que llaman a AppViewModel.
+// Opciones de configuración.
 val settingOptions = listOf(
     SettingOption(
         title = "Opciones de cuenta",
@@ -50,23 +50,23 @@ val settingOptions = listOf(
 )
 
 private val accountOptions = listOf(
-    SettingOption(
+    SettingOption( // TODO
         title = "Cambiar nombre de usuario",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
-    SettingOption(
+    SettingOption( // TODO
         title = "Cambiar correo electronico",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
+        onClickAction = { _, _, navController -> navController.navigate(AppScreens.PasswordRecoveryScreen.route)}
     ),
-    SettingOption(
+    SettingOption( // TODO
         title = "Cambiar contraseña",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
-    SettingOption(
+    SettingOption( // TODO
         title = "Cambiar biografía",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
-    SettingOption(
+    SettingOption( // TODO
         title = "Cambiar foto de perfil",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
@@ -87,41 +87,40 @@ private val accountOptions = listOf(
 )
 
 private val notificationOptions = listOf(
-    SettingOption(
+    SettingOption( // TODO
         title = "Recibir notifiaciones",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog() }
     ),
 )
 
 private val privacyOptions = listOf(
-    SettingOption(
+    SettingOption( // TODO
         title = "Cambiar privacidad",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
 )
 
 private val commentsOptions = listOf(
-    SettingOption(
+    SettingOption( // TODO
         title = "Ver comentarios",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
-    SettingOption(
+    SettingOption( // TODO
         title = "Contacto con soporte",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
 )
 
 private val accesibilityOptions = listOf(
-    SettingOption(
+    SettingOption( // TODO
         title = "Modo oscuro",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
-    SettingOption(
+    SettingOption( // TODO
         title = "Cambiar de idioma",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
-
-    SettingOption(
+    SettingOption( // TODO
         title = "Tamaño de fuente",
         onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
     ),
