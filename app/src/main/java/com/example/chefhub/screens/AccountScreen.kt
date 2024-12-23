@@ -78,18 +78,18 @@ private fun AccountContent(navController: NavController, appViewModel: AppViewMo
         // Sección de información del usuario.
         UserInfoSection(
             appUiState = appUiState,
-            onButtonClick = { showDialog = true } // En un futuro se quitara esto y se enviara el appViewModel para hacer las funciones.
+            onClick = { showDialog = true } // En un futuro se quitara esto y se enviara el appViewModel para hacer las funciones.
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(Modifier.height(10.dp))
 
         // Biografía del usuario.
         UserBioSection(appUiState.user.bio)
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
 
         // Barra de navegación de recetas.
         RecipeNavigationBar(
-            onRecipesClick = { appViewModel.changeView("recipes") },
-            onSavedClick = { appViewModel.changeView("saved") },
+            onRecipesClick = { appViewModel.changeView("recipes", appUiState.user.userId) },
+            onSavedClick = { appViewModel.changeView("saved", appUiState.user.userId) },
             onOtherClick = { showDialog = true }
         )
 
@@ -112,7 +112,7 @@ private fun AccountContent(navController: NavController, appViewModel: AppViewMo
 @Composable
 private fun UserInfoSection(
     appUiState: AppUiState,
-    onButtonClick: () -> Unit
+    onClick: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -134,15 +134,15 @@ private fun UserInfoSection(
         // Botones con estadísticas del usuario.
         InvisibleButton(
             texto = "${appUiState.recipes.size}\nRecetas",
-            onClick = onButtonClick
+            onClick = onClick
         )
         InvisibleButton(
             texto = "${appUiState.followers.size}\nSeguidores",
-            onClick = onButtonClick
+            onClick = onClick
         )
         InvisibleButton(
             texto = "${appUiState.following.size}\nSeguidos",
-            onClick = onButtonClick
+            onClick = onClick
         )
     }
 }

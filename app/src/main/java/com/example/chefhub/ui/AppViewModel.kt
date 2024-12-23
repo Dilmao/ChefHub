@@ -430,17 +430,18 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
 
     fun changeView(
         view: String,
+        userId: Int
     ) {
         viewModelScope.launch {
             val updatedList: ArrayList<Recipes> = when (view) {
                 "recipes" -> {
                     // Recoger las recetas del usuario como una lista y convertirlas a ArrayList
-                    val recipes = database.recipesDao.getRecipesByUser(appUiState.value.user.userId).firstOrNull() ?: emptyList()
+                    val recipes = database.recipesDao.getRecipesByUser(userId).firstOrNull() ?: emptyList()
                     ArrayList(recipes.toCollection(mutableListOf()))
                 }
                 "saved" -> {
                     // Recoger las recetas favoritas del usuario como una lista y convertirlas a ArrayList
-                    val favorites = database.favoritesDao.getFavoritesForUser(appUiState.value.user.userId).firstOrNull() ?: emptyList()
+                    val favorites = database.favoritesDao.getFavoritesForUser(userId).firstOrNull() ?: emptyList()
                     ArrayList(favorites.toCollection(mutableListOf()))
                 }
                 "something" -> {
