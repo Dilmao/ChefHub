@@ -21,7 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.example.chefhub.R
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.screens.components.ClickableText
@@ -33,7 +33,7 @@ import com.example.chefhub.screens.components.showMessage
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
-fun RegisterScreen(navController: NavHostController, appViewModel: AppViewModel) {
+fun RegisterScreen(navController: NavController, appViewModel: AppViewModel) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Contenido principal de RegisterScreen.
         RegisterContent(navController, appViewModel)
@@ -41,7 +41,7 @@ fun RegisterScreen(navController: NavHostController, appViewModel: AppViewModel)
 }
 
 @Composable
-fun RegisterContent(navController: NavHostController, appViewModel: AppViewModel) {
+private fun RegisterContent(navController: NavController, appViewModel: AppViewModel) {
     // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
@@ -100,7 +100,7 @@ fun RegisterContent(navController: NavHostController, appViewModel: AppViewModel
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Botón de registro.
+        // Botón para registrarse.
         SimpleButton(
             texto = "Registrarse",
             onClick = {
@@ -108,9 +108,9 @@ fun RegisterContent(navController: NavHostController, appViewModel: AppViewModel
                 appViewModel.checkRegister(confirmPassword) { validation ->
                     when (validation) {
                         1 -> showMessage(context, "Uno o más campos están vacíos.")
-                        2 -> showMessage(context, "El correo debe contener un @.")
+                        2 -> showMessage(context, "El correo debe contener un '@'.")
                         3 -> showMessage(context, "La contraseña debe contener entre 10 y 30 caractere.")
-                        4 -> showMessage(context, "Ambas contraseñas deben ser iguales.")
+                        4 -> showMessage(context, "Ambas contraseñas deben coindicir.")
                         5 -> showMessage(context, "El correo electrónico ya está registrado.")
                         6 -> showMessage(context, "El nombre introducido ya está en uso.")
                         7 -> showMessage(context, "Error inesperado. Por favor, contacte con soporte técnico.")

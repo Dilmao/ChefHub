@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,7 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.example.chefhub.R
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.screens.components.ClickableText
@@ -35,7 +33,7 @@ import com.example.chefhub.screens.components.showMessage
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
-fun PasswordRecoveryScreen(navController: NavHostController, appViewModel: AppViewModel) {
+fun PasswordRecoveryScreen(navController: NavController, appViewModel: AppViewModel) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Contenido principal de PasswordRecoveryScreen.
         PasswordRecoveryContent(navController, appViewModel)
@@ -43,7 +41,7 @@ fun PasswordRecoveryScreen(navController: NavHostController, appViewModel: AppVi
 }
 
 @Composable
-fun PasswordRecoveryContent(navController: NavHostController, appViewModel: AppViewModel) {
+private fun PasswordRecoveryContent(navController: NavController, appViewModel: AppViewModel) {
     // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
@@ -66,8 +64,11 @@ fun PasswordRecoveryContent(navController: NavHostController, appViewModel: AppV
         )
         Spacer(modifier = Modifier.height(40.dp))
 
-        // Instrucciones para restablecer la contraseña.
-        Text(text = "Introduzca la dirección de correo electrónico asociada con su cuenta y le enviaremos un enlace para restablecer su contraseña.")
+        // Instrucciones para el usuario.
+        Text(
+            text = "Introduzca la dirección de correo electrónico asociada con su cuenta y le enviaremos un enlace para restablecer su contraseña.",
+            modifier = Modifier.padding(16.dp)
+        )
         Spacer(modifier = Modifier.height(20.dp))
 
         // Campo para el correo electrónico.
@@ -79,7 +80,7 @@ fun PasswordRecoveryContent(navController: NavHostController, appViewModel: AppV
         )
         Spacer(modifier = Modifier.height(20.dp))
         
-        // Botón para restablecer la contraseña.
+        // Botón para enviar el enlace de recuperación.
         SimpleButton(
             texto = "Reestablecer contraseña",
             onClick = {
@@ -107,7 +108,7 @@ fun PasswordRecoveryContent(navController: NavHostController, appViewModel: AppV
         )
     }
 
-    // Mostrar alerta si 'showMessage' es true.
+    // Alerta para confirmar que se envió el correo electrónico.
     if (showDialog) {
         PasswordRecoveryAlert(
             message = "Se ha enviado un correo electrónico a la dirección: \"${appUiState.user.email}\".\n Siga las instrucciones en el correo para cambiar la contraseña.",

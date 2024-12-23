@@ -17,14 +17,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.example.chefhub.scaffold.MyGeneralTopAppBar
 import com.example.chefhub.screens.components.ContentAlert
 import com.example.chefhub.screens.components.SettingButton
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
-fun SettingsScreen(navController: NavHostController, appViewModel: AppViewModel) {
+fun SettingsScreen(navController: NavController, appViewModel: AppViewModel) {
+    // Estructura de la pantalla.
     Scaffold(
         topBar = { MyGeneralTopAppBar("Configuración") },
     ) { paddingValues ->
@@ -34,38 +35,38 @@ fun SettingsScreen(navController: NavHostController, appViewModel: AppViewModel)
                 .padding(paddingValues)
                 .background(Color(0xFFF5F5F5)) // Fondo gris claro
         ) {
-            SettingsScreenContent(navController, appViewModel)
+            // Contenido principal de SettingsScreen.
+            SettingsContent(navController, appViewModel)
         }
     }
 }
 
 @Composable
-fun SettingsScreenContent(navController: NavHostController, appViewModel: AppViewModel) {
-    // COMENTARIO.
+private fun SettingsContent(navController: NavController, appViewModel: AppViewModel) {
+    // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
 
+    // Diseño de la pantalla.
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
+        modifier = Modifier.fillMaxSize().padding(20.dp)
     ) {
         // Iterar sobre las opciones de configuración para crear los botones.
         appUiState.settingsOptions.forEach { option ->
             SettingButton(
                 title = option.title,
                 onClick = {
-                    option.onClickAction(appViewModel, { showDialog = true }, navController)
+                    option.onClick()
+                    if (option.showDialog) showDialog = true
                 }
             )
         }
     }
 
+    // Diálogo emergente.
     if (showDialog) {
-        ContentAlert(
-            onDismissRequest = { showDialog = false }
-        )
+        ContentAlert(onDismissRequest = { showDialog = false })
     }
 }

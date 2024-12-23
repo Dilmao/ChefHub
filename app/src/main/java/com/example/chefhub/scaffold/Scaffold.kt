@@ -5,10 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -34,7 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.chefhub.R
-import com.example.chefhub.db.settingOptions
+import com.example.chefhub.db.getMainSettingsOptions
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.ui.AppViewModel
 
@@ -54,7 +52,7 @@ fun MyAccountTopAppBar(
         ),
         actions = {
             IconButton(onClick = {
-                appViewModel.onChangeSettingsScreen(settingOptions)
+                appViewModel.onChangeSettingsScreen(getMainSettingsOptions(appViewModel, navController))
                 navController.navigate(AppScreens.SettingsScreen.route)
             }) {
                 Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings", tint = Color.Black)

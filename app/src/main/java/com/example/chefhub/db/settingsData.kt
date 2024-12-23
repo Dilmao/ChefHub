@@ -1,127 +1,157 @@
 package com.example.chefhub.db
 
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.ui.AppViewModel
 
 // Data class que acepta una acción que utiliza AppViewModel.
 data class SettingOption(
     val title: String,
-    val onClickAction: (AppViewModel, () -> Unit, NavHostController) -> Unit
+    val onClick: () -> Unit,
+    val showDialog: Boolean = false
 )
 
-// Opciones de configuración.
-val settingOptions = listOf(
+// Opciones principales de configuración.
+fun getMainSettingsOptions(
+    appViewModel: AppViewModel,
+    navController: NavController
+): List<SettingOption> = listOf(
     SettingOption(
-        title = "Opciones de cuenta",
-        onClickAction = { appViewModel, _, navController ->
-            appViewModel.onChangeSettingsScreen(accountOptions)
-            navController.navigate(AppScreens.SettingsScreen.route)
+        title= "Opciones de cuenta",
+        onClick = {
+            appViewModel.onChangeSettingsScreen(getAccountOptions(appViewModel, navController))
         }
     ),
     SettingOption(
-        title = "Notificaciones",
-        onClickAction = { appViewModel, _, navController ->
-            appViewModel.onChangeSettingsScreen(notificationOptions)
-            navController.navigate(AppScreens.SettingsScreen.route)
+        title= "Notificaciones",
+        onClick = {
+            appViewModel.onChangeSettingsScreen(getNotificationOptions(appViewModel, navController))
         }
     ),
     SettingOption(
-        title = "Privacidad",
-        onClickAction = { appViewModel, _, navController ->
-            appViewModel.onChangeSettingsScreen(privacyOptions)
-            navController.navigate(AppScreens.SettingsScreen.route)
+        title= "Privacidad",
+        onClick = {
+            appViewModel.onChangeSettingsScreen(getPrivacyOptions(appViewModel, navController))
         }
     ),
     SettingOption(
-        title = "Comentarios y Soporte",
-        onClickAction = { appViewModel, _, navController ->
-            appViewModel.onChangeSettingsScreen(commentsOptions)
-            navController.navigate(AppScreens.SettingsScreen.route)
+        title= "Comentarios y Soporte",
+        onClick = {
+            appViewModel.onChangeSettingsScreen(getCommentsOptions(appViewModel, navController))
         }
     ),
     SettingOption(
-        title = "Accesibilidad",
-        onClickAction = { appViewModel, _, navController ->
-            appViewModel.onChangeSettingsScreen(accesibilityOptions)
-            navController.navigate(AppScreens.SettingsScreen.route)
+        title= "Accesibilidad",
+        onClick = {
+            appViewModel.onChangeSettingsScreen(getAccessibilityOptions(appViewModel, navController))
         }
     ),
 )
 
-private val accountOptions = listOf(
-    SettingOption( // TODO
-        title = "Cambiar nombre de usuario",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
-    ),
-    SettingOption( // TODO
-        title = "Cambiar correo electronico",
-        onClickAction = { _, _, navController -> navController.navigate(AppScreens.PasswordRecoveryScreen.route)}
-    ),
-    SettingOption( // TODO
-        title = "Cambiar contraseña",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
-    ),
-    SettingOption( // TODO
-        title = "Cambiar biografía",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
-    ),
-    SettingOption( // TODO
-        title = "Cambiar foto de perfil",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
+// Opciones de cuenta.
+private fun getAccountOptions(
+    appViewModel: AppViewModel,
+    navController: NavController
+): List<SettingOption> = listOf(
+    SettingOption(
+        title= "Cambiar nombre de usuario",
+        onClick = { /* TODO */ },
+        showDialog = true
     ),
     SettingOption(
-        title = "Cerrar sesión",
-        onClickAction = { appViewModel, _, navController ->
+        title= "Cambiar correo electrónico",
+        onClick = { navController.navigate(AppScreens.PasswordRecoveryScreen.route) }
+    ),
+    SettingOption(
+        title= "Cambiar contraseña",
+        onClick = { /* TODO */ },
+        showDialog = true
+    ),
+    SettingOption(
+        title= "Cambiar biografía",
+        onClick = { /* TODO */ },
+        showDialog = true
+    ),
+    SettingOption(
+        title= "Cambiar foto de perfil",
+        onClick = { /* TODO */ },
+        showDialog = true
+    ),
+    SettingOption(
+        title= "Cerrar sesión",
+        onClick = {
             appViewModel.logOut()
             navController.navigate(AppScreens.LoginScreen.route)
         }
     ),
     SettingOption(
-        title = "Borrar cuenta",
-        onClickAction = { appViewModel, _, navController ->
+        title= "Borrar cuenta",
+        onClick = {
             appViewModel.deleteAccount()
             navController.navigate(AppScreens.LoginScreen.route)
         }
     ),
 )
 
-private val notificationOptions = listOf(
-    SettingOption( // TODO
-        title = "Recibir notifiaciones",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog() }
-    ),
+// Opciones de notificaciones.
+private fun getNotificationOptions(
+    appViewModel: AppViewModel,
+    navController: NavController,
+): List<SettingOption> = listOf(
+    SettingOption(
+        title = "Recibir notificaciones",
+        onClick = { /* TODO */ },
+        showDialog = true
+    )
 )
 
-private val privacyOptions = listOf(
-    SettingOption( // TODO
+// Opciones de privacidad.
+private fun getPrivacyOptions(
+    appViewModel: AppViewModel,
+    navController: NavController,
+): List<SettingOption> = listOf(
+    SettingOption(
         title = "Cambiar privacidad",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
-    ),
+        onClick = { /* TODO */ },
+        showDialog = true
+    )
 )
 
-private val commentsOptions = listOf(
-    SettingOption( // TODO
+// Opciones de comentarios y soporte.
+private fun getCommentsOptions(
+    appViewModel: AppViewModel,
+    navController: NavController,
+): List<SettingOption> = listOf(
+    SettingOption(
         title = "Ver comentarios",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
+        onClick = { /* TODO */ },
+        showDialog = true
     ),
-    SettingOption( // TODO
+    SettingOption(
         title = "Contacto con soporte",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
-    ),
+        onClick = { /* TODO */ },
+        showDialog = true
+    )
 )
 
-private val accesibilityOptions = listOf(
-    SettingOption( // TODO
+// Opciones de accesibilidad.
+private fun getAccessibilityOptions(
+    appViewModel: AppViewModel,
+    navController: NavController,
+): List<SettingOption> = listOf(
+    SettingOption(
         title = "Modo oscuro",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
+        onClick = { /* TODO */ },
+        showDialog = true
     ),
-    SettingOption( // TODO
+    SettingOption(
         title = "Cambiar de idioma",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
+        onClick = { /* TODO */ },
+        showDialog = true
     ),
-    SettingOption( // TODO
+    SettingOption(
         title = "Tamaño de fuente",
-        onClickAction = { _, showNotImplementedDialog, _ -> showNotImplementedDialog()}
-    ),
+        onClick = { /* TODO */ },
+        showDialog = true
+    )
 )

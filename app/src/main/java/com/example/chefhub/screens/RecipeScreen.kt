@@ -1,6 +1,5 @@
 package com.example.chefhub.screens
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -48,70 +45,66 @@ import com.example.chefhub.ui.AppViewModel
 
 @Composable
 fun RecipeScreen(navController: NavController, appViewModel: AppViewModel) {
-    // COMENTARIO.
+    // Estructura de la pantalla.
     Scaffold(
-        bottomBar = { MyMainBottomBar("Account", navController) }
+        bottomBar = { MyMainBottomBar("", navController) }
     ) { paddingValues ->
-        // COMENTARIO.
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // COMENTARIO.
-            RecipeScreenContent(navController, appViewModel)
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            // Contenido principal de RecipeScreen.
+            RecipeContent(navController, appViewModel)
         }
     }
 }
 
 @Composable
-fun RecipeScreenContent(navController: NavController, appViewModel: AppViewModel) {
+private fun RecipeContent(navController: NavController, appViewModel: AppViewModel) {
+    // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
-    val context = LocalContext.current
     val recipe = appUiState.recipe
 
+    // Diseño de la pantalla.
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(30.dp),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.Start,
+        modifier = Modifier.fillMaxSize().padding(30.dp)
     ) {
-        /** Sección: Imagen de la receta **/
+        // Sección de imagen de la receta.
         item { RecipeImageSection() }
+        item { Spacer(Modifier.height(20.dp)) }
 
-        /** Sección: Título y botón para guardar **/
-        item { TitleAndSaveButton(recipe, appViewModel, context, appUiState) }
+        // Sección de título y botón de guardar.
+        item { TitleAndSaveButton(recipe, appViewModel, appUiState) }
+        item { Spacer(Modifier.height(20.dp)) }
 
-        /** Separador sombreado (TODO) **/
+        // TODO: Separador sombreado
 
-        /** Sección: Información adicional **/
+        // Sección de detalles de la receta.
         item { RecipeDetailsSection(recipe, appUiState) }
+        item { Spacer(Modifier.height(20.dp)) }
 
-        /** Sección: Lista de ingredientes **/
+        // Sección de ingredientes.
         item { HeaderItem("Ingredientes:") }
         items(recipe.ingredients.size) { index ->
             ListItem(recipe.ingredients[index])
         }
         item { Spacer(Modifier.height(20.dp)) }
 
+        // Sección de instrucciones.
         item { HeaderItem("Instrucciones:") }
         items(recipe.instructions.size) { index ->
             ListItem(recipe.instructions[index])
         }
         item { Spacer(Modifier.height(20.dp)) }
 
-        /** Sección: Botones de edición y eliminación **/
+        // Sección de botones (solamente visibles para el creador de la receta).
         if (recipe.userId == appUiState.user.userId) {
-            item {
-                EditAndDeleteButtons(recipe, appViewModel, navController)
-            }
+            item { EditAndDeleteButtons(recipe, appViewModel, navController) }
         }
     }
 }
 
 @Composable
-fun RecipeImageSection() {
+private fun RecipeImageSection() {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
@@ -126,23 +119,22 @@ fun RecipeImageSection() {
                 .background(Color.LightGray)
         )
     }
-    Spacer(Modifier.height(20.dp))
 }
 
 @Composable
-fun TitleAndSaveButton(
+private fun TitleAndSaveButton(
     recipe: Recipes,
     appViewModel: AppViewModel,
-    context: Context,
     appUiState: AppUiState
 ) {
+    val context = LocalContext.current
     var recipeSaved by remember { mutableStateOf(appUiState.favorites.any { it.recipeId == recipe.recipeId }) }
     var action by remember { mutableStateOf("save") }
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth()
     ) {
         Text(
             text = recipe.title,
@@ -163,17 +155,14 @@ fun TitleAndSaveButton(
                 ),
                 contentDescription = if (recipeSaved) "Receta guardada" else "Guardar receta",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RectangleShape)
+                modifier = Modifier.size(40.dp).clip(RectangleShape)
             )
         }
     }
-    Spacer(Modifier.height(20.dp))
 }
 
 @Composable
-fun RecipeDetailsSection(recipe: Recipes, appUiState: AppUiState) {
+private fun RecipeDetailsSection(recipe: Recipes, appUiState: AppUiState) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -203,7 +192,7 @@ fun RecipeDetailsSection(recipe: Recipes, appUiState: AppUiState) {
 }
 
 @Composable
-fun RecipeDetailRow(
+private fun RecipeDetailRow(
     icon: Int,
     label: String,
     value: String
@@ -227,11 +216,10 @@ fun RecipeDetailRow(
             Text(value)
         }
     }
-    Spacer(modifier = Modifier.height(20.dp))
 }
 
 @Composable
-fun HeaderItem(header: String) {
+private fun HeaderItem(header: String) {
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -247,10 +235,8 @@ fun HeaderItem(header: String) {
 @Composable
 private fun ListItem(item: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
     ) {
         // Icono de viñeta (bullet point)
         Text(
@@ -267,17 +253,15 @@ private fun ListItem(item: String) {
 }
 
 @Composable
-fun EditAndDeleteButtons(
+private fun EditAndDeleteButtons(
     recipe: Recipes,
     appViewModel: AppViewModel,
     navController: NavController
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp),
+        verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.Bottom
+        modifier = Modifier.fillMaxWidth().padding(20.dp)
     ) {
         RecipeButton(
             texto = "Editar",

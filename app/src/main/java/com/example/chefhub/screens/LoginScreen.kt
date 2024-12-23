@@ -21,7 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.example.chefhub.R
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.screens.components.ClickableText
@@ -35,7 +35,7 @@ import com.example.chefhub.ui.AppViewModel
 import kotlin.system.exitProcess
 
 @Composable
-fun LoginScreen(navController: NavHostController, appViewModel: AppViewModel) {
+fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Contenido principal de LoginScreen.
         LoginContent(navController, appViewModel)
@@ -45,9 +45,14 @@ fun LoginScreen(navController: NavHostController, appViewModel: AppViewModel) {
 /*
   * TODO:
   *  1. Pedir permisos al iniciar la aplicación (manifest, lineas 10 ~ 13, pedir ayuda a chatGPT).
+  *  2. Funcionalidad de "opciones de cuenta" (Cambiar nombre de usuario, correo, contraseña, biografia, foto de perfil)
+  *  3. Modificar AddRecipe y ModifyRecipe para añadir campos para foto, descripcion, categorias y dificultad.
+  *  4. Modificar RecipeScreen para añadir campos para valorar y seccion de comentarios.
+  *  5. Tal vez, hacer que el botón "¿ALGO?" en AccountScreen te permita modificar información de la cuenta (como en "Opciones de cuenta")
+  *  6. Añadir condicion de contraseña al crear cuenta (1 Mayuscula y 1 Minuscula (ya esta hecho en Firebase)).
 */
 @Composable
-fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
+private fun LoginContent(navController: NavController, appViewModel: AppViewModel) {
     // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
     val context = LocalContext.current
@@ -98,7 +103,7 @@ fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Botón de inicio de sesión.
+        // Botón para iniciar sesión.
         SimpleButton(
             texto = "Iniciar sesión",
             onClick = {
@@ -106,8 +111,8 @@ fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
                 appViewModel.checkLogin { validation ->
                     when (validation) {
                         1 -> showMessage(context, "Uno o más campos están vacíos.")
-                        2 -> showMessage(context, "Correo introducido no encontrado en DB.")
-                        3 -> if (appUiState.tries != 0) showMessage(context, "Contraseña equivocada, ${appUiState.tries} intentos restantes.")
+                        2 -> showMessage(context, "Correo no encontrado en la base de datos.")
+                        3 -> if (appUiState.tries != 0) showMessage(context, "Contraseña incorrecta. Intentos restantes: ${appUiState.tries}.")
                         4 -> showMessage(context, "Error inesperado. Por favor, contacte con soporte técnico.")
                         else -> {
                             saveCredentials(context, appUiState.user.email, appUiState.user.password)
@@ -116,6 +121,7 @@ fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
                         }
                     }
 
+                    // Se cierra la aplicación si no quedan intentos.
                     if (appUiState.tries == 0) {
                         showMessage(context, "Se agotaron los intentos. La aplicación se cerrará.")
                         exitProcess(0)
@@ -125,7 +131,7 @@ fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Textos clicables para registrarse.
+        // Texto clicable para registrarse.
         ClickableText(
             mensaje = "¿No tienes una cuenta? ",
             enlace = "Registrarse",
@@ -135,7 +141,7 @@ fun LoginContent(navController: NavHostController, appViewModel: AppViewModel) {
             }
         )
 
-        // Texto clicable para recuperar contraseña.
+        // Texto clicable para recuperar la contraseña.
         ClickableText(
             mensaje = "¿Has olvidado tu contraseña?  ",
             enlace = "Ayuda",

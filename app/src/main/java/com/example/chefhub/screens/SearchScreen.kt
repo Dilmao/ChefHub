@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,125 +29,150 @@ import com.example.chefhub.screens.components.InvisibleButton
 import com.example.chefhub.screens.components.RecipeCard
 import com.example.chefhub.screens.components.SearchField
 import com.example.chefhub.screens.components.UserCard
+import com.example.chefhub.ui.AppUiState
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
 fun SearchScreen(navController: NavController, appViewModel: AppViewModel) {
-    // COMENTARIO.
+    // Estructura de la pantalla.
     Scaffold(
         bottomBar = { MyMainBottomBar("Search", navController) }
     ) { paddingValues ->
-        // COMENTARIO.
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            SearchScreenContent(navController, appViewModel)
+            // Contenido principal de SearchScreen.
+            SearchContent(navController, appViewModel)
         }
     }
 }
 
 @Composable
-fun SearchScreenContent(navController: NavController, appViewModel: AppViewModel) {
+private fun SearchContent(navController: NavController, appViewModel: AppViewModel) {
+    // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
-    var type by rememberSaveable { mutableStateOf("recipes") }
-    var loaded by remember { mutableStateOf(false) }
+    var selectedSearchType by rememberSaveable { mutableStateOf("recipes") }
     var showDialog by remember { mutableStateOf(false) }
 
-    // COMENTARIO.
-    if (!loaded) {
-        appViewModel.search(type)
-        loaded = true
+    // Se realiza la búsqueda al cambiar el tipo o la query de búsqueda.
+    LaunchedEffect(selectedSearchType) {
+        appViewModel.search(selectedSearchType)
     }
 
+    // Diseño de la pantalla.
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
+        // Barra de búsqueda.
         Row(
-            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(10.dp)
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
         ) {
             SearchField(
                 value = appUiState.search,
                 onValueChange = { appViewModel.onSearchChanged(it) },
-                onSearch= { appViewModel.search(type) }
+                onSearch= { appViewModel.search(selectedSearchType) }
             )
         }
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            InvisibleButton(
-                texto = "Recetas",
-                onClick = {
-                    type = "recipes"
-                    appViewModel.search(type)
-                }
-            )
+        // Botones para cambiar el tipo de búsqueda.
+        SearchTypeButtons(
+            onTypeSelected = { type ->
+                selectedSearchType = type
+            }
+        )
 
-            InvisibleButton(
-                texto = "Usuarios",
-                onClick = {
-                    type = "users"
-                    appViewModel.search(type)
-                }
-            )
+        // Se muestran los resultados según el tipo de búsqueda.
+        SearchResults(
+            selectedSearchType = selectedSearchType,
+            appViewModel = appViewModel,
+            appUiState = appUiState,
+            navController = navController,
+            onCategorySelected = { showDialog = true }
+        )
+    }
 
-            InvisibleButton(
-                texto = "Categorias",
-                onClick = {
-                    type = "categories"
-                    appViewModel.search(type)
-                }
-            )
-        }
+    // Diálogo emergente.
+    if (showDialog) {
+        ContentAlert(onDismissRequest = { showDialog = false })
+    }
+}
 
-        LazyColumn(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
-            modifier = Modifier.fillMaxWidth().padding(10.dp)
-        ) {
-            if (type.equals("users")) {
+@Composable
+private fun SearchTypeButtons(onTypeSelected: (String) -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        InvisibleButton(
+            texto = "Recetas",
+            onClick = { onTypeSelected("recipes") }
+        )
+        InvisibleButton(
+            texto = "Usaurios",
+            onClick = { onTypeSelected("users") }
+        )
+        InvisibleButton(
+            texto = "Categorias",
+            onClick = { onTypeSelected("categories") }
+        )
+    }
+}
+
+@Composable
+private fun SearchResults(
+    selectedSearchType: String,
+    appViewModel: AppViewModel,
+    appUiState: AppUiState,
+    navController: NavController,
+    onCategorySelected: () -> Unit
+) {
+    LazyColumn(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth().padding(10.dp)
+    ) {
+        when (selectedSearchType) {
+            "users" -> {
                 items(appUiState.users.size) { index ->
-                    if (appUiState.users[index].userId != appUiState.user.userId) {
+                    val user = appUiState.users[index]
+                    if (user.userId != appUiState.user.userId) {
                         UserCard(
-                            user = appUiState.users[index],
+                            user = user,
                             onClick = {
-                                appViewModel.onSelectUser(appUiState.users[index])
+                                appViewModel.onSelectUser(user)
                                 navController.navigate(AppScreens.ViewedUserScreen.route)
                             }
                         )
                     }
                 }
-            } else if (type.equals("recipes")) {
+            }
+            "recipes" -> {
                 items(appUiState.recipes.size) { index ->
-                    if (appUiState.recipes[index].userId != appUiState.user.userId) {
+                    val recipe = appUiState.recipes[index]
+                    if (recipe.userId != appUiState.user.userId) {
                         RecipeCard(
-                            recipe = appUiState.recipes[index],
+                            recipe = recipe,
                             onClick = {
-                                appViewModel.onSelectRecipe(appUiState.recipes[index])
+                                appViewModel.onSelectRecipe(recipe)
                                 navController.navigate(AppScreens.RecipeScreen.route)
                             }
                         )
                     }
                 }
-            } else if (type.equals("categories")) {
+            }
+            "categories" -> {
                 items(appUiState.categories.size) { index ->
+                    val category = appUiState.categories[index]
                     CategoryCard(
-                        category = appUiState.categories[index],
-                        onClick = {
-                            showDialog = true
-                        }
+                        category = category,
+                        onClick = onCategorySelected
                     )
                 }
             }
         }
-    }
-
-    if (showDialog) {
-        ContentAlert(
-            onDismissRequest = { showDialog = false }
-        )
     }
 }

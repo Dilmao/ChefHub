@@ -4,7 +4,6 @@ import com.example.chefhub.db.SettingOption
 import com.example.chefhub.db.data.Categories
 import com.example.chefhub.db.data.Recipes
 import com.example.chefhub.db.data.Users
-import com.example.chefhub.db.settingOptions
 
 data class AppUiState(
     /** General variables **/
@@ -39,5 +38,5 @@ data class AppUiState(
     val servings: Int = 0,
 
     /** Settings screen variables **/
-    val settingsOptions: List<SettingOption> = settingOptions,
+    val settingsOptions: List<SettingOption> = emptyList()
 )

@@ -31,158 +31,180 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.chefhub.R
+import com.example.chefhub.db.data.Recipes
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.scaffold.MyAccountTopAppBar
 import com.example.chefhub.scaffold.MyMainBottomBar
 import com.example.chefhub.screens.components.ContentAlert
 import com.example.chefhub.screens.components.InvisibleButton
 import com.example.chefhub.screens.components.RecipeCard
+import com.example.chefhub.ui.AppUiState
 import com.example.chefhub.ui.AppViewModel
 
 @Composable
 fun AccountScreen(navController: NavController, appViewModel: AppViewModel) {
-    // COMENTARIO.
     val appUiState by appViewModel.appUiState.collectAsState()
 
-    // COMENTARIO.
+    // Estructura de la pantalla.
     Scaffold(
         topBar = { MyAccountTopAppBar(appUiState.user.userName, navController, appViewModel) },
         bottomBar = { MyMainBottomBar("Account", navController) }
     ) { paddingValues ->
-        // COMENTARIO.
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // COMENTARIO.
-            AccountScreenContent(navController, appViewModel)
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            // Contenido principal de AccountScreen.
+            AccountContent(navController, appViewModel)
         }
     }
 }
 
 @Composable
-fun AccountScreenContent(navController: NavController, appViewModel: AppViewModel) {
-    // COMENTARIO.
+private fun AccountContent(navController: NavController, appViewModel: AppViewModel) {
+    // Se obtiene el contexto y el estado de la UI.
     val appUiState by appViewModel.appUiState.collectAsState()
     var loadedRecipes by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
-    // COMENTARIO.
+    // Se cargan los datos de AccountScreen.
     if (!loadedRecipes) {
         appViewModel.loadAccount()
         loadedRecipes = true
     }
 
-    // COMENTARIO.
+    // Diseño de la pantalla.
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // COMENTARIO.
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp)
-        ) {
-            // COMENTARIO.
-            Image(
-                painter = painterResource(id = R.drawable.icono_usuario_estandar),
-                contentDescription = "Usuario",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(90.dp)
-                    .clip(CircleShape)
-            )
-
-            // COMENTARIO.
-            InvisibleButton(
-                texto = "${appUiState.recipes.size}\nRecetas",
-                onClick = { showDialog = true }
-            )
-
-            // COMENTARIO.
-            InvisibleButton(
-                texto = "${appUiState.followers.size}\nSeguidores",
-                onClick = { showDialog = true }
-            )
-
-            // COMENTARIO.
-            InvisibleButton(
-                texto = "${appUiState.following.size}\nSeguidos",
-                onClick = { showDialog = true }
-            )
-        }
+        // Sección de información del usuario.
+        UserInfoSection(
+            appUiState = appUiState,
+            onButtonClick = { showDialog = true } // En un futuro se quitara esto y se enviara el appViewModel para hacer las funciones.
+        )
         Spacer(modifier = Modifier.height(10.dp))
 
-        // COMENTARIO.
-        Column(
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp)
-        ) {
-            appUiState.user.bio?.let { Text(it) }
-        }
+        // Biografía del usuario.
+        UserBioSection(appUiState.user.bio)
         Spacer(modifier = Modifier.height(20.dp))
 
-        // COMENTARIO.
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // COMENTARIO.
-            InvisibleButton(
-                texto = "Mis recetas",
-                onClick = { appViewModel.changeView("recipes") }
-            )
+        // Barra de navegación de recetas.
+        RecipeNavigationBar(
+            onRecipesClick = { appViewModel.changeView("recipes") },
+            onSavedClick = { appViewModel.changeView("saved") },
+            onOtherClick = { showDialog = true }
+        )
 
-            // COMENTARIO.
-            Text("|")
-
-            // COMENTARIO.
-            InvisibleButton(
-                texto = "Guardadas",
-                onClick = { appViewModel.changeView("saved") }
-            )
-
-            // COMENTARIO.
-            Text("|")
-
-            // COMENTARIO.
-            InvisibleButton(
-                texto = "¿ALGO?",
-                onClick = { showDialog = true }
-            )
-        }
-
-        // COMENTARIO.
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.LightGray)
-                .padding(10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(appUiState.recipes.size) { index ->
-                RecipeCard(
-                    recipe = appUiState.recipes[index],
-                    onClick = {
-                        appViewModel.onSelectRecipe(appUiState.recipes[index])
-                        navController.navigate(AppScreens.RecipeScreen.route)
-                    }
-                )
+        // Lista de recetas del usuario.
+        UserRecipeList(
+            recipes = appUiState.recipes,
+            onRecipeClick = {
+                appViewModel.onSelectRecipe(it)
+                navController.navigate(AppScreens.RecipeScreen.route)
             }
-        }
+        )
     }
 
+    // Diálogo emergente.
     if (showDialog) {
-        ContentAlert(
-            onDismissRequest = { showDialog = false }
+        ContentAlert(onDismissRequest = { showDialog = false })
+    }
+}
+
+@Composable
+private fun UserInfoSection(
+    appUiState: AppUiState,
+    onButtonClick: () -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp)
+    ) {
+        // Imagen de perfil de usuario.
+        Image(
+            painter = painterResource(id = R.drawable.icono_usuario_estandar),
+            contentDescription = "Usuario",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(90.dp)
+                .clip(CircleShape)
         )
+
+        // Botones con estadísticas del usuario.
+        InvisibleButton(
+            texto = "${appUiState.recipes.size}\nRecetas",
+            onClick = onButtonClick
+        )
+        InvisibleButton(
+            texto = "${appUiState.followers.size}\nSeguidores",
+            onClick = onButtonClick
+        )
+        InvisibleButton(
+            texto = "${appUiState.following.size}\nSeguidos",
+            onClick = onButtonClick
+        )
+    }
+}
+
+@Composable
+private fun UserBioSection(bio: String?) {
+    Column(
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp)
+    ) {
+        bio?.let { Text(text = it) }
+    }
+}
+
+@Composable
+private fun RecipeNavigationBar(
+    onRecipesClick: () -> Unit,
+    onSavedClick: () -> Unit,
+    onOtherClick: () -> Unit,
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        InvisibleButton(
+            texto = "Mis recetas",
+            onClick = onRecipesClick
+        )
+        Text("|")
+        InvisibleButton(
+            texto = "Guardadas",
+            onClick = onSavedClick
+        )
+        Text("|")
+        InvisibleButton(
+            texto = "¿ALGO?",
+            onClick = onOtherClick
+        )
+    }
+}
+
+@Composable
+private fun UserRecipeList(
+    recipes: List<Recipes>,
+    onRecipeClick: (Recipes) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.LightGray)
+            .padding(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        items(recipes.size) { index ->
+            RecipeCard(
+                recipe = recipes[index],
+                onClick = { onRecipeClick(recipes[index]) }
+            )
+        }
     }
 }

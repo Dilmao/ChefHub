@@ -464,7 +464,9 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
     /** Funciones SettingsScreen **/
     fun onChangeSettingsScreen(newList: List<SettingOption>) {
         _appUiState.update { currentState ->
-            currentState.copy(settingsOptions = newList) // TODO: Arreglar
+            currentState.copy(
+                settingsOptions = newList
+            )
         }
     }
 
