@@ -86,7 +86,6 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
   *  2. Modificar AddRecipe y ModifyRecipe para añadir campos para foto, descripcion, categorias y dificultad.
   *  3. Modificar RecipeScreen para añadir campos para valorar y seccion de comentarios.
   *  4. Tal vez, hacer que el botón "¿ALGO?" en AccountScreen te permita modificar información de la cuenta (como en "Opciones de cuenta")
-  *  5. Añadir condicion de contraseña al crear cuenta (1 Mayuscula y 1 Minuscula (ya esta hecho en Firebase)).
 */
 @Composable
 private fun LoginContent(navController: NavController, appViewModel: AppViewModel) {
