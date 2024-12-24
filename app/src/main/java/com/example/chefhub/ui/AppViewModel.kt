@@ -227,12 +227,14 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
                 callback(2) // 2: El correo no contiene '@'.
             } else if(newPassword.length < 10 || newPassword.length > 30) {
                 callback(3) // 3: La contraseña tiene un tamaño inválido.
+            } else if (!newPassword.matches(Regex("^(?=.*[a-z])(?=.*[A-Z]).+$"))) {
+                callback(4) // 4: La contraseña debe contener al menos una letra mayúscula y una letra minúscula.
             } else if(!newPassword.equals(confirmPassword)) {
-                callback(4) // 4: Contraseña y confirmación no coindicen.
+                callback(5) // 5: Contraseña y confirmación no coindicen.
             } else if(database.usersDao.getUserByEmail(newEmail) != null) {
-                callback(5) // 5: El correo ya existe en SQLite.
+                callback(6) // 6: El correo ya existe en SQLite.
             } else if(database.usersDao.getUserByUserName(newUserName) != null) {
-                callback(6) // 6: El nombre ya existe en SQLite.
+                callback(7) // 7: El nombre ya existe en SQLite.
             } else {
                 // Se registra el usuario en Firebase.
                 auth.createUserWithEmailAndPassword(newEmail, newPassword).addOnCompleteListener { task ->
@@ -253,15 +255,15 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
                                 }
                                 callback(0) // 0: Registro exitoso.
                             } catch (e: Exception) {
-                                callback(7) // 7: Error inesperado al guardar el usuario en SQLite.
+                                callback(8) // 8: Error inesperado al guardar el usuario en SQLite.
                             }
                         }
                     } else {
                         // Correo electrónico ya en uso en Firebase.
                         if (task.exception is FirebaseAuthUserCollisionException) {
-                            callback(5) // 5: El correo ya existe en Firebase.
+                            callback(6) // 6: El correo ya existe en Firebase.
                         } else {
-                            callback(7) // 7: Error inesperado al registrar el usuario en Firebase.
+                            callback(8) // 8: Error inesperado al registrar el usuario en Firebase.
                         }
                     }
                 }

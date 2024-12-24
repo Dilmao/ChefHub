@@ -109,11 +109,12 @@ private fun RegisterContent(navController: NavController, appViewModel: AppViewM
                     when (validation) {
                         1 -> showMessage(context, "Uno o más campos están vacíos.")
                         2 -> showMessage(context, "El correo debe contener un '@'.")
-                        3 -> showMessage(context, "La contraseña debe contener entre 10 y 30 caractere.")
-                        4 -> showMessage(context, "Ambas contraseñas deben coindicir.")
-                        5 -> showMessage(context, "El correo electrónico ya está registrado.")
-                        6 -> showMessage(context, "El nombre introducido ya está en uso.")
-                        7 -> showMessage(context, "Error inesperado. Por favor, contacte con soporte técnico.")
+                        3 -> showMessage(context, "La contraseña debe contener entre 10 y 30 caracteres.")
+                        4 -> showMessage(context, "La contraseña debe contener al menos una mayúscula y una minúscula.")
+                        5 -> showMessage(context, "Ambas contraseñas deben coindicir.")
+                        6 -> showMessage(context, "El correo electrónico ya está registrado.")
+                        7 -> showMessage(context, "El nombre introducido ya está en uso.")
+                        8 -> showMessage(context, "Error inesperado. Por favor, contacte con soporte técnico.")
                         else -> {
                             saveCredentials(context, appUiState.user.email, appUiState.user.password)
                             showMessage(context, "Nuevo usuario creado con éxito.")
