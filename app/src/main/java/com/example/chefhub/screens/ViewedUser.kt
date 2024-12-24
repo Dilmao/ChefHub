@@ -201,7 +201,7 @@ private fun RecipeNavigationBar(
         modifier = Modifier.fillMaxWidth()
     ) {
         InvisibleButton(
-            texto = "Mis recetas",
+            texto = "Recetas",
             onClick = onRecipesClick
         )
         Text("|")
