@@ -82,10 +82,8 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
 
 /*
   * TODO:
-  *  1. Funcionalidad de "opciones de cuenta" (Cambiar nombre de usuario, correo, contraseña, biografia, foto de perfil)
-  *  2. Modificar AddRecipe y ModifyRecipe para añadir campos para foto, descripcion, categorias y dificultad.
-  *  3. Modificar RecipeScreen para añadir campos para valorar y seccion de comentarios.
-  *  4. Tal vez, hacer que el botón "¿ALGO?" en AccountScreen te permita modificar información de la cuenta (como en "Opciones de cuenta")
+  *  1. Modificar AddRecipe y ModifyRecipe para añadir campos para foto, descripcion, categorias y dificultad.
+  *  2. Modificar RecipeScreen para añadir campos para valorar y seccion de comentarios.
 */
 @Composable
 private fun LoginContent(navController: NavController, appViewModel: AppViewModel) {
