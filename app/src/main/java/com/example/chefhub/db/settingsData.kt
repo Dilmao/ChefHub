@@ -2,6 +2,7 @@ package com.example.chefhub.db
 
 import androidx.navigation.NavController
 import com.example.chefhub.navigation.AppScreens
+import com.example.chefhub.screens.components.ContentAlert
 import com.example.chefhub.ui.AppViewModel
 
 // Data class que acepta una acción que utiliza AppViewModel.
@@ -54,28 +55,12 @@ private fun getAccountOptions(
     navController: NavController
 ): List<SettingOption> = listOf(
     SettingOption(
-        title= "Cambiar nombre de usuario",
-        onClick = { /* TODO */ },
-        showDialog = true
-    ),
-    SettingOption(
-        title= "Cambiar correo electrónico",
-        onClick = { navController.navigate(AppScreens.PasswordRecoveryScreen.route) }
+        title= "Editar perfil",
+        onClick = { navController.navigate(AppScreens.EditUserInfoScreen.route) }
     ),
     SettingOption(
         title= "Cambiar contraseña",
-        onClick = { /* TODO */ },
-        showDialog = true
-    ),
-    SettingOption(
-        title= "Cambiar biografía",
-        onClick = { /* TODO */ },
-        showDialog = true
-    ),
-    SettingOption(
-        title= "Cambiar foto de perfil",
-        onClick = { /* TODO */ },
-        showDialog = true
+        onClick = { navController.navigate(AppScreens.PasswordRecoveryScreen.route) }
     ),
     SettingOption(
         title= "Cerrar sesión",

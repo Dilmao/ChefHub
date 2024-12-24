@@ -7,8 +7,6 @@ import com.example.chefhub.db.data.Users
 
 data class AppUiState(
     /** General variables **/
-    val messageText: String = "",
-    val showMessage: Boolean = false,
     val tries: Int = 3,
 
 

@@ -43,7 +43,7 @@ import kotlin.system.exitProcess
 fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
     val context = LocalContext.current
 
-    // Solicitud de permisos al inicio
+    // Solicitud de permisos al inicio.
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -54,10 +54,10 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
         }
     }
 
-    // Estado para controlar la solicitud de permisos
+    // Estado para controlar la solicitud de permisos.
     var permissionsRequested by remember { mutableStateOf(false) }
 
-    // Lista de permisos según la versión del sistema
+    // Lista de permisos según la versión del sistema.
     val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(
             Manifest.permission.READ_MEDIA_IMAGES
@@ -66,7 +66,7 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
         arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
 
-    // Lanzar solicitud de permisos al montar la composición
+    // Se lanza una solicitud de permisos al montar la composición.
     LaunchedEffect(Unit) {
         if (!permissionsRequested) {
             permissionLauncher.launch(permissions)
@@ -74,8 +74,8 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
         }
     }
 
-    // Contenido principal
     Box(modifier = Modifier.fillMaxSize()) {
+        // Contenido principal de LoginScreen.
         LoginContent(navController, appViewModel)
     }
 }
@@ -117,7 +117,7 @@ private fun LoginContent(navController: NavController, appViewModel: AppViewMode
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(300.dp)
         )
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(Modifier.height(40.dp))
 
         // Campo para el correo electrónico.
         SimpleTextField(
@@ -126,7 +126,7 @@ private fun LoginContent(navController: NavController, appViewModel: AppViewMode
             label = "Correo electrónico",
             required = true
         )
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
 
         // Campo para la contraseña.
         PasswordTextField(
@@ -135,7 +135,7 @@ private fun LoginContent(navController: NavController, appViewModel: AppViewMode
             label = "Contraseña",
             required = true
         )
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
 
         // Botón para iniciar sesión.
         SimpleButton(
@@ -163,7 +163,7 @@ private fun LoginContent(navController: NavController, appViewModel: AppViewMode
                 }
             }
         )
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
 
         // Texto clicable para registrarse.
         ClickableText(

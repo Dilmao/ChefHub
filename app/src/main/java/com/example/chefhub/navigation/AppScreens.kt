@@ -11,5 +11,6 @@ sealed class AppScreens (val route: String) {
     data object ModifyRecipeScreen: AppScreens(route = "modify_recipe_screen")
     data object RecipeScreen: AppScreens(route = "recipe_screen")
     data object AccountScreen: AppScreens(route = "account_screen")
+    data object EditUserInfoScreen: AppScreens(route = "edit_user_info_screen")
     data object SettingsScreen: AppScreens(route = "settings_screen")
 }

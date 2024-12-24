@@ -90,7 +90,7 @@ private fun AccountContent(navController: NavController, appViewModel: AppViewMo
         RecipeNavigationBar(
             onRecipesClick = { appViewModel.changeView("recipes", appUiState.user.userId) },
             onSavedClick = { appViewModel.changeView("saved", appUiState.user.userId) },
-            onOtherClick = { showDialog = true }
+            onEditClick = { navController.navigate(AppScreens.EditUserInfoScreen.route) }
         )
 
         // Lista de recetas del usuario.
@@ -164,7 +164,7 @@ private fun UserBioSection(bio: String?) {
 private fun RecipeNavigationBar(
     onRecipesClick: () -> Unit,
     onSavedClick: () -> Unit,
-    onOtherClick: () -> Unit,
+    onEditClick: () -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -182,8 +182,8 @@ private fun RecipeNavigationBar(
         )
         Text("|")
         InvisibleButton(
-            texto = "¿ALGO?",
-            onClick = onOtherClick
+            texto = "Editar perfil",
+            onClick = onEditClick
         )
     }
 }

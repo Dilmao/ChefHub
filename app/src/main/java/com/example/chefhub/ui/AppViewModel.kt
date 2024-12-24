@@ -1,7 +1,6 @@
 package com.example.chefhub.ui
 
 import android.content.Context
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chefhub.db.ChefhubDB
@@ -11,7 +10,6 @@ import com.example.chefhub.db.data.Follows
 import com.example.chefhub.db.data.Recipes
 import com.example.chefhub.db.data.Users
 import com.example.chefhub.db.repository.RecipesRepository
-import com.example.chefhub.screens.components.clearCredentials
 import com.example.chefhub.screens.components.showMessage
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -27,20 +25,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.math.exp
 
 class AppViewModel(private val database: ChefhubDB): ViewModel() {
     private val _appUiState = MutableStateFlow(AppUiState())
     val appUiState: StateFlow<AppUiState> = _appUiState.asStateFlow()
-
-    /** Funciones generales **/
-    fun restartBoolean() {
-        // Se reinician las variables de tipo boolean.
-        _appUiState.update { currentState ->
-            currentState.copy(showMessage = false)
-        }
-    }
-
 
     /** Funciones User **/
     fun <T> onUserChanged(
@@ -59,10 +47,22 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
             "profilePicture" -> if (newValue is String) updatedState = currentState.copy(user = currentState.user.copy(profilePicture = newValue))
             "bio" -> if (newValue is String) updatedState = currentState.copy(user = currentState.user.copy(bio = newValue))
             "isActive" -> if (newValue is Boolean) updatedState = currentState.copy(user = currentState.user.copy(isActive = newValue))
+            "all" -> if (newValue is Users) {
+                updatedState = currentState.copy(user = newValue)
+
+                // Se actualiza la base de datos con el nuevo valor.
+                updateUserInDatabase(newValue)
+            }
         }
 
         // Se actualiza el estado de la UI.
         _appUiState.update { updatedState }
+    }
+
+    private fun updateUserInDatabase(user: Users) {
+        viewModelScope.launch {
+            database.usersDao.updateUser(user)
+        }
     }
 
     fun resetUserValues() {

@@ -10,6 +10,7 @@ import com.example.chefhub.db.ChefhubDB
 import com.example.chefhub.db.DatabaseInitializer
 import com.example.chefhub.screens.AccountScreen
 import com.example.chefhub.screens.AddRecipeScreen
+import com.example.chefhub.screens.EditUserInfoScreen
 import com.example.chefhub.screens.LoginScreen
 import com.example.chefhub.screens.MainScreen
 import com.example.chefhub.screens.ModifyRecipeScreen
@@ -46,6 +47,7 @@ fun AppNavigation() {
         composable(route = AppScreens.ModifyRecipeScreen.route) { ModifyRecipeScreen(navController, appViewModel) }
         composable(route = AppScreens.RecipeScreen.route) { RecipeScreen(navController, appViewModel) }
         composable(route = AppScreens.AccountScreen.route) { AccountScreen(navController, appViewModel) }
+        composable(route = AppScreens.EditUserInfoScreen.route) { EditUserInfoScreen(navController, appViewModel) }
         composable(route = AppScreens.SettingsScreen.route) { SettingsScreen(navController, appViewModel) }
     }
 }
