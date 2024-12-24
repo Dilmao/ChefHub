@@ -1,5 +1,9 @@
 package com.example.chefhub.screens
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,20 +41,52 @@ import kotlin.system.exitProcess
 
 @Composable
 fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
+    val context = LocalContext.current
+
+    // Solicitud de permisos al inicio
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        permissions.entries.forEach { entry ->
+            if (!entry.value) {
+                showMessage(context, "Permiso ${entry.key} denegado. Algunas funcionalidades pueden no estar disponibles.")
+            }
+        }
+    }
+
+    // Estado para controlar la solicitud de permisos
+    var permissionsRequested by remember { mutableStateOf(false) }
+
+    // Lista de permisos según la versión del sistema
+    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        arrayOf(
+            Manifest.permission.READ_MEDIA_IMAGES
+        )
+    } else {
+        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+    }
+
+    // Lanzar solicitud de permisos al montar la composición
+    LaunchedEffect(Unit) {
+        if (!permissionsRequested) {
+            permissionLauncher.launch(permissions)
+            permissionsRequested = true
+        }
+    }
+
+    // Contenido principal
     Box(modifier = Modifier.fillMaxSize()) {
-        // Contenido principal de LoginScreen.
         LoginContent(navController, appViewModel)
     }
 }
 
 /*
   * TODO:
-  *  1. Pedir permisos al iniciar la aplicación (manifest, lineas 10 ~ 13, pedir ayuda a chatGPT).
-  *  2. Funcionalidad de "opciones de cuenta" (Cambiar nombre de usuario, correo, contraseña, biografia, foto de perfil)
-  *  3. Modificar AddRecipe y ModifyRecipe para añadir campos para foto, descripcion, categorias y dificultad.
-  *  4. Modificar RecipeScreen para añadir campos para valorar y seccion de comentarios.
-  *  5. Tal vez, hacer que el botón "¿ALGO?" en AccountScreen te permita modificar información de la cuenta (como en "Opciones de cuenta")
-  *  6. Añadir condicion de contraseña al crear cuenta (1 Mayuscula y 1 Minuscula (ya esta hecho en Firebase)).
+  *  1. Funcionalidad de "opciones de cuenta" (Cambiar nombre de usuario, correo, contraseña, biografia, foto de perfil)
+  *  2. Modificar AddRecipe y ModifyRecipe para añadir campos para foto, descripcion, categorias y dificultad.
+  *  3. Modificar RecipeScreen para añadir campos para valorar y seccion de comentarios.
+  *  4. Tal vez, hacer que el botón "¿ALGO?" en AccountScreen te permita modificar información de la cuenta (como en "Opciones de cuenta")
+  *  5. Añadir condicion de contraseña al crear cuenta (1 Mayuscula y 1 Minuscula (ya esta hecho en Firebase)).
 */
 @Composable
 private fun LoginContent(navController: NavController, appViewModel: AppViewModel) {
@@ -72,9 +109,7 @@ private fun LoginContent(navController: NavController, appViewModel: AppViewMode
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
+        modifier = Modifier.fillMaxSize().padding(20.dp)
     ) {
         // Logo de ChefHub.
         Image(
