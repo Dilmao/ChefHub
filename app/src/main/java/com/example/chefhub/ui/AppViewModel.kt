@@ -7,6 +7,7 @@ import com.example.chefhub.db.ChefhubDB
 import com.example.chefhub.db.SettingOption
 import com.example.chefhub.db.data.Favorites
 import com.example.chefhub.db.data.Follows
+import com.example.chefhub.db.data.Ratings
 import com.example.chefhub.db.data.Recipes
 import com.example.chefhub.db.data.Users
 import com.example.chefhub.db.repository.RecipesRepository
@@ -589,21 +590,25 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
 
 
     fun onSelectRecipe(recipe: Recipes) {
-        val prepHour = recipe.prepTime?.div(60) ?: 0
-        val prepMin = recipe.prepTime?.rem(60) ?: 0
-        val cookHour = recipe.cookTime?.div(60) ?: 0
-        val cookMin = recipe.cookTime?.rem(60) ?: 0
-        val servings = recipe.servings ?: 0
+        viewModelScope.launch {
+            val prepHour = recipe.prepTime?.div(60) ?: 0
+            val prepMin = recipe.prepTime?.rem(60) ?: 0
+            val cookHour = recipe.cookTime?.div(60) ?: 0
+            val cookMin = recipe.cookTime?.rem(60) ?: 0
+            val servings = recipe.servings ?: 0
+            val ratings = database.ratingsDao.getRatingsForRecipe(recipe.recipeId).firstOrNull() ?: emptyList()
 
-        _appUiState.update { currentState ->
-            currentState.copy(
-                recipe = recipe,
-                prepHour = prepHour,
-                prepMin = prepMin,
-                cookHour = cookHour,
-                cookMin = cookMin,
-                servings = servings
-            )
+            _appUiState.update { currentState ->
+                currentState.copy(
+                    recipe = recipe,
+                    prepHour = prepHour,
+                    prepMin = prepMin,
+                    cookHour = cookHour,
+                    cookMin = cookMin,
+                    servings = servings,
+                    ratings = ratings.toMutableList(),
+                )
+            }
         }
     }
 
@@ -636,6 +641,51 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
             val favoriteRecipes = database.favoritesDao.getFavoritesForUser(appUiState.value.user.userId).first().toMutableList()
             _appUiState.update { currentState ->
                 currentState.copy(favorites = favoriteRecipes)
+            }
+        }
+    }
+
+    fun onRateRecipe(selectedRating: Int) {
+        viewModelScope.launch {
+            val recipeId = appUiState.value.recipe.recipeId
+            val userId = appUiState.value.user.userId
+
+            // Se verifica si ya existe una valoración para este usuario y receta.
+            val existingRating = database.ratingsDao.getRatingForUserAndRecipe(userId, recipeId)
+
+            if (existingRating != null) {
+                // Si existe, se actualiza la valoración.
+                val updatedRating = existingRating.copy(rating = selectedRating)
+
+                database.ratingsDao.updateRating(updatedRating)
+
+                // COMENTARIO.
+                val updatedList = ArrayList(appUiState.value.ratings).apply {
+                    val index = indexOfFirst { it.ratingId == existingRating.ratingId }
+                    if (index != -1) {
+                        this[index] = updatedRating
+                    }
+                }
+
+                _appUiState.update { currentState ->
+                    currentState.copy(ratings = updatedList)
+                }
+            } else {
+                // Si no existe, insertamos una nueva valoración.
+                val newRating = Ratings(
+                    userId = userId,
+                    recipeId = recipeId,
+                    rating = selectedRating
+                )
+
+                database.ratingsDao.insertRating(newRating)
+
+                val updatedList = ArrayList(appUiState.value.ratings)
+                updatedList.add(newRating)
+
+                _appUiState.update { currentState ->
+                    currentState.copy(ratings = updatedList)
+                }
             }
         }
     }

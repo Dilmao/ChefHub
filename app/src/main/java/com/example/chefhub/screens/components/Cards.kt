@@ -53,9 +53,7 @@ fun RecipeCard(recipe: Recipes, onClick: () -> Unit) {
                     painter = painterResource(id = R.drawable.logo_no_bg),
                     contentDescription = "Imagen de la receta",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
+                    modifier = Modifier.size(100.dp).clip(CircleShape)
                 )
             }
 
@@ -65,9 +63,7 @@ fun RecipeCard(recipe: Recipes, onClick: () -> Unit) {
                     text = recipe.title,
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
+                    modifier = Modifier.fillMaxWidth().padding(10.dp)
                 )
                 // Muestra el tiempo de preparación, cocción y las porciones
                 Text(text = "Tiempo de preparación: ${prepHour}:${prepMin}")
@@ -99,9 +95,7 @@ fun UserCard(user: Users, onClick: () -> Unit) {
                     painter = painterResource(id = R.drawable.icono_usuario_estandar),
                     contentDescription = "Avatar del usuario",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape)
+                    modifier = Modifier.size(50.dp).clip(CircleShape)
                 )
             }
 
@@ -111,9 +105,7 @@ fun UserCard(user: Users, onClick: () -> Unit) {
                     text = user.userName,
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
+                    modifier = Modifier.fillMaxWidth().padding(10.dp)
                 )
                 user.bio?.let { Text(text = it) }
             }
@@ -142,9 +134,7 @@ fun CategoryCard(category: Categories, onClick: () -> Unit) {
                 painter = painterResource(id = R.drawable.logo_no_bg),
                 contentDescription = "Icono de la categoría",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape)
+                modifier = Modifier.size(50.dp).clip(CircleShape)
             )
 
             // Nombre de la categoría
@@ -152,12 +142,26 @@ fun CategoryCard(category: Categories, onClick: () -> Unit) {
                 text = category.categoryName,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
+                modifier = Modifier.fillMaxWidth().padding(10.dp)
             )
         }
     }
 
     Spacer(modifier = Modifier.height(10.dp))
+}
+
+@Composable
+fun MiniCategoryCard(categoryName: String) {
+    // Tarjeta que muestra la información de una categoría
+    Card(
+        colors = CardDefaults.cardColors(Color.Gray),
+    ) {
+        // Nombre de la categoría
+        Text(
+            text = categoryName,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(10.dp)
+        )
+    }
 }

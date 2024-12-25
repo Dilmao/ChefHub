@@ -80,11 +80,6 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel) {
     }
 }
 
-/*
-  * TODO:
-  *  1. Modificar AddRecipe y ModifyRecipe para añadir campos para foto, descripcion, categorias y dificultad.
-  *  2. Modificar RecipeScreen para añadir campos para valorar y seccion de comentarios.
-*/
 @Composable
 private fun LoginContent(navController: NavController, appViewModel: AppViewModel) {
     // Se obtiene el contexto y el estado de la UI.

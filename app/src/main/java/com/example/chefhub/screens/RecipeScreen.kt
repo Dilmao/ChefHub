@@ -2,6 +2,7 @@ package com.example.chefhub.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,6 +45,7 @@ import com.example.chefhub.R
 import com.example.chefhub.db.data.Recipes
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.scaffold.MyMainBottomBar
+import com.example.chefhub.screens.components.MiniCategoryCard
 import com.example.chefhub.screens.components.RecipeButton
 import com.example.chefhub.ui.AppUiState
 import com.example.chefhub.ui.AppViewModel
@@ -49,7 +56,9 @@ fun RecipeScreen(navController: NavController, appViewModel: AppViewModel) {
     Scaffold(
         bottomBar = { MyMainBottomBar("", navController) }
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
             // Contenido principal de RecipeScreen.
             RecipeContent(navController, appViewModel)
         }
@@ -66,7 +75,9 @@ private fun RecipeContent(navController: NavController, appViewModel: AppViewMod
     LazyColumn(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start,
-        modifier = Modifier.fillMaxSize().padding(30.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(30.dp)
     ) {
         // Sección de imagen de la receta.
         item { RecipeImageSection() }
@@ -74,9 +85,12 @@ private fun RecipeContent(navController: NavController, appViewModel: AppViewMod
 
         // Sección de título y botón de guardar.
         item { TitleAndSaveButton(recipe, appViewModel, appUiState) }
-        item { Spacer(Modifier.height(20.dp)) }
 
         // TODO: Separador sombreado
+
+        // Sección de categorias.
+        item { CategoryValorationSection(appUiState, appViewModel) }
+        item { Spacer(Modifier.height(10.dp)) }
 
         // Sección de detalles de la receta.
         item { RecipeDetailsSection(recipe, appUiState) }
@@ -155,8 +169,70 @@ private fun TitleAndSaveButton(
                 ),
                 contentDescription = if (recipeSaved) "Receta guardada" else "Guardar receta",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(40.dp).clip(RectangleShape)
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RectangleShape)
             )
+        }
+    }
+}
+
+@Composable
+private fun CategoryValorationSection(appUiState: AppUiState, appViewModel: AppViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedRating by remember { mutableStateOf(0) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // COMENTARIO.
+        if (!appUiState.recipe.categoryName.isNullOrBlank()) {
+            MiniCategoryCard(categoryName = appUiState.recipe.categoryName)
+        }
+
+        // COMENTARIO.
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = "Icono favoritos",
+                tint = Color(0xFFFFC107),
+                modifier = Modifier.clickable { expanded = !expanded }
+            )
+
+            Text(
+                text = if (appUiState.ratings.isNotEmpty()) {
+                    var average = 0.0
+                    appUiState.ratings.forEach { rating ->
+                        average += rating.rating
+                    }
+                    "${average / appUiState.ratings.size}"
+                } else {
+                    "0"
+                },
+                modifier = Modifier.padding(start = 4.dp, end = 4.dp)
+            )
+
+            Text("(${appUiState.ratings.size})")
+        }
+
+        // Dropdown menu
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            for (i in 1..5) {
+                DropdownMenuItem(
+                    text = { Text("$i") },
+                    onClick = {
+                        selectedRating = i
+                        appViewModel.onRateRecipe(selectedRating)
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }
@@ -236,7 +312,9 @@ private fun HeaderItem(header: String) {
 private fun ListItem(item: String) {
     Row(
         verticalAlignment = Alignment.Top,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
     ) {
         // Icono de viñeta (bullet point)
         Text(
@@ -261,7 +339,9 @@ private fun EditAndDeleteButtons(
     Row(
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth().padding(20.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp)
     ) {
         RecipeButton(
             texto = "Editar",

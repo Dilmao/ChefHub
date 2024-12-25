@@ -2,6 +2,7 @@ package com.example.chefhub.ui
 
 import com.example.chefhub.db.SettingOption
 import com.example.chefhub.db.data.Categories
+import com.example.chefhub.db.data.Ratings
 import com.example.chefhub.db.data.Recipes
 import com.example.chefhub.db.data.Users
 
@@ -24,6 +25,9 @@ data class AppUiState(
 
     /** Category-related variables **/
     val categories: MutableList<Categories> = arrayListOf(),
+
+    /** Rating-related variables **/
+    val ratings: MutableList<Ratings> = arrayListOf(),
 
     /** Search variables **/
     val search: String = "",
