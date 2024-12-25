@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chefhub.db.ChefhubDB
 import com.example.chefhub.db.SettingOption
-import com.example.chefhub.db.data.Categories
 import com.example.chefhub.db.data.Favorites
 import com.example.chefhub.db.data.Follows
 import com.example.chefhub.db.data.Recipes
@@ -381,6 +380,7 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
 
         val recipe = Recipes(
             userId = uiState.user.userId,
+            categoryName = uiState.recipe.categoryName,
             title = uiState.recipe.title,
             description = uiState.recipe.description,
             dificulty = uiState.recipe.dificulty,

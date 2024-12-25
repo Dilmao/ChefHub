@@ -78,7 +78,7 @@ private fun AddRecipeContent(navController: NavController, appViewModel: AppView
         item { Spacer(Modifier.height(30.dp)) }
 
         // Sección de categorías.
-//        item { AddCategorySection(appUiState, appViewModel) }
+        item { AddCategorySection(appUiState, appViewModel) }
         item { Spacer(Modifier.height(30.dp)) }
 
         // Sección de dificultad.
@@ -144,34 +144,31 @@ private fun AddCategorySection(appUiState: AppUiState, appViewModel: AppViewMode
     var expanded by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf("") }
 
-    Column {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text("Categorias: ", fontWeight = FontWeight.Bold, fontSize = 20.sp)
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // Botón para desplegar el menú de categorías.
-            Button(onClick = { expanded = true }) {
-                Text(text = selectedCategory.ifEmpty { "Selecciona una categoria" })
-            }
+        // Botón para desplegar el menú de categorías.
+        Button(onClick = { expanded = true }) {
+            Text(text = selectedCategory.ifEmpty { "Selecciona una categoria" })
+        }
 
-            // Menú desplegable.
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                appUiState.categories.forEach { category ->
-                    println("Categoria: ${category.categoryName}")
-                    DropdownMenuItem(
-                        text = { Text(category.categoryName) },
-                        onClick = {
-                            selectedCategory = category.categoryName
-                            appViewModel.onRecipeChanged(selectedCategory, "category")
-                            expanded = false
-                        }
-                    )
-                }
+        // Menú desplegable.
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            appUiState.categories.forEach { category ->
+                DropdownMenuItem(
+                    text = { Text(category.categoryName) },
+                    onClick = {
+                        selectedCategory = category.categoryName
+                        appViewModel.onRecipeChanged(selectedCategory, "category")
+                        expanded = false
+                    }
+                )
             }
         }
     }
@@ -184,7 +181,10 @@ private fun AddDificultySection(appUiState: AppUiState, appViewModel: AppViewMod
     var expanded by remember { mutableStateOf(false) }
     var selectedDificulty by remember { mutableStateOf("") }
 
-    Column {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text("Dificultad: ", fontWeight = FontWeight.Bold, fontSize = 20.sp)
 
         Box {

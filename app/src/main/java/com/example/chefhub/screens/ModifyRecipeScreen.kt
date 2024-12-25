@@ -140,9 +140,7 @@ private fun AddCategorySection(appUiState: AppUiState, appViewModel: AppViewMode
         Text("Categorias: ", fontWeight = FontWeight.Bold, fontSize = 20.sp)
 
         // Botón para desplegar el menú de categorías.
-        Button(onClick = { expanded = true
-        println("Categorias: ${appUiState.categories}")
-        }) {
+        Button(onClick = { expanded = true }) {
             Text(text = selectedCategory.ifEmpty { "Selecciona una categoria" })
         }
 
@@ -152,12 +150,12 @@ private fun AddCategorySection(appUiState: AppUiState, appViewModel: AppViewMode
             onDismissRequest = { expanded = false }
         ) {
             appUiState.categories.forEach { category ->
-                println("Categoria: ${category.categoryName}")
                 DropdownMenuItem(
                     text = { Text(category.categoryName) },
                     onClick = {
                         selectedCategory = category.categoryName
-                        appViewModel.onRecipeChanged(category, "category")
+                        println("Categoria: $selectedCategory | $category")
+                        appViewModel.onRecipeChanged(selectedCategory, "category")
                         expanded = false
                     }
                 )
