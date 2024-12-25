@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chefhub.db.ChefhubDB
 import com.example.chefhub.db.SettingOption
+import com.example.chefhub.db.data.Categories
 import com.example.chefhub.db.data.Favorites
 import com.example.chefhub.db.data.Follows
 import com.example.chefhub.db.data.Recipes
@@ -91,6 +92,8 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
         when (valueName) {
             "title" -> if (newValue is String) updatedState = currentState.copy(recipe = currentState.recipe.copy(title = newValue))
             "description" -> if (newValue is String) updatedState = currentState.copy(recipe = currentState.recipe.copy(description = newValue))
+            "dificulty" -> if (newValue is String) updatedState = currentState.copy(recipe = currentState.recipe.copy(dificulty = newValue))
+            "category" -> if (newValue is String) updatedState = currentState.copy(recipe = currentState.recipe.copy(categoryName = newValue))
             "imageUrl" -> if (newValue is String) updatedState = currentState.copy(recipe = currentState.recipe.copy(imageUrl = newValue))
             "prepHour" -> if (newValue is Int) updatedState = currentState.copy(prepHour = newValue)
             "prepMin" -> if (newValue is Int) updatedState = currentState.copy(prepMin = newValue)
@@ -314,9 +317,15 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
             // Obtener las recetas de los usuarios seguidos y convertirlas en MutableList.
             val recipesList = database.recipesDao.getRecipesByFollowedUsers(followedUsersIds).firstOrNull() ?: emptyList()
 
+            // Obtener todas las categorías.
+            val categories = database.categoriesDao.getCategories().firstOrNull() ?: emptyList()
+
             // Actualizar el estado de la UI.
             _appUiState.update { currentState ->
-                currentState.copy(recipes = recipesList.toMutableList())
+                currentState.copy(
+                    recipes = recipesList.toMutableList(),
+                    categories = categories.toMutableList()
+                )
             }
         }
     }
@@ -374,6 +383,7 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
             userId = uiState.user.userId,
             title = uiState.recipe.title,
             description = uiState.recipe.description,
+            dificulty = uiState.recipe.dificulty,
             ingredients = uiState.recipe.ingredients,
             instructions = uiState.recipe.instructions,
             imageUrl = uiState.recipe.imageUrl,
@@ -392,19 +402,23 @@ class AppViewModel(private val database: ChefhubDB): ViewModel() {
                         "create" -> {
                             recipesRepository.insertRecipe(recipe)
                             showMessage(context, "Receta creada con éxito.")
+                            callback(true)
                         }
                         "save" -> {
                             recipe.recipeId = uiState.recipe.recipeId
                             recipesRepository.updateRecipe(recipe)
                             showMessage(context, "Receta actualizada con éxito.")
+                            callback(true)
                         }
                         else -> {
                             showMessage(context, "Acción desconocida: $action.")
+                            callback(false)
                         }
                     }
                 } catch (e: Exception) {
                     val errorMsg = "Error al ${if (action == "create") "crear" else "guardar"} la receta: ${e.message}"
                     showMessage(context, errorMsg)
+                    callback(false)
                 }
             }
         }

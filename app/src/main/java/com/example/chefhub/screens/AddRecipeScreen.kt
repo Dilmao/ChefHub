@@ -2,15 +2,19 @@ package com.example.chefhub.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,7 +43,9 @@ fun AddRecipeScreen(navController: NavController, appViewModel: AppViewModel) {
     Scaffold(
         bottomBar = { MyMainBottomBar("AddRecipe", navController) }
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
             // Contenido principal de AddRecipe.
             AddRecipeContent(navController, appViewModel)
         }
@@ -63,13 +69,21 @@ private fun AddRecipeContent(navController: NavController, appViewModel: AppView
     LazyColumn(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().padding(20.dp, bottom = 80.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp, bottom = 80.dp)
     ) {
         // Sección de nombre de la receta.
         item { AddRecipeNameSection(appUiState, appViewModel) }
         item { Spacer(Modifier.height(30.dp)) }
 
-        // TODO: Seccion para introducir la categoria a la receta
+        // Sección de categorías.
+//        item { AddCategorySection(appUiState, appViewModel) }
+        item { Spacer(Modifier.height(30.dp)) }
+
+        // Sección de dificultad.
+        item { AddDificultySection(appUiState, appViewModel) }
+        item { Spacer(Modifier.height(30.dp)) }
 
         // Sección de ingredientes.
         item { AddIngredientsSection(appUiState, appViewModel) }
@@ -95,7 +109,9 @@ private fun AddRecipeContent(navController: NavController, appViewModel: AppView
     Row(
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize().padding(20.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
     ) {
         Button(onClick = {
             appViewModel.saveRecipe(context, "create") { createSuccesfull ->
@@ -120,6 +136,81 @@ private fun AddRecipeNameSection(appUiState: AppUiState, appViewModel: AppViewMo
         label = "Nombre",
         required = true
     )
+}
+
+// Sección para la categoria de la receta.
+@Composable
+private fun AddCategorySection(appUiState: AppUiState, appViewModel: AppViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedCategory by remember { mutableStateOf("") }
+
+    Column {
+        Text("Categorias: ", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // Botón para desplegar el menú de categorías.
+            Button(onClick = { expanded = true }) {
+                Text(text = selectedCategory.ifEmpty { "Selecciona una categoria" })
+            }
+
+            // Menú desplegable.
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                appUiState.categories.forEach { category ->
+                    println("Categoria: ${category.categoryName}")
+                    DropdownMenuItem(
+                        text = { Text(category.categoryName) },
+                        onClick = {
+                            selectedCategory = category.categoryName
+                            appViewModel.onRecipeChanged(selectedCategory, "category")
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+// Sección para la dificultad de la receta.
+@Composable
+private fun AddDificultySection(appUiState: AppUiState, appViewModel: AppViewModel) {
+    val dificulties = listOf("Muy fácil", "Fácil", "Medio", "Difícil", "Muy difícil")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedDificulty by remember { mutableStateOf("") }
+
+    Column {
+        Text("Dificultad: ", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+        Box {
+            // Botón para desplegar el menú de dificultades.
+            Button(onClick = { expanded = true }) {
+                Text(text = selectedDificulty.ifEmpty { "Selecciona una dificultad" })
+            }
+
+            // Menú desplegable.
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                dificulties.forEach { dificulty ->
+                    DropdownMenuItem(
+                        text = { Text(dificulty) },
+                        onClick = {
+                            selectedDificulty = dificulty
+                            appViewModel.onRecipeChanged(selectedDificulty, "dificulty")
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
 }
 
 // Sección para los ingredientes de la receta.

@@ -13,13 +13,12 @@ import com.example.chefhub.db.data.*
         Users::class,
         Recipes::class,
         Categories::class,
-        RecipeCategories::class,
         Comments::class,
         Ratings::class,
         Favorites::class,
         Follows::class
     ],
-    version = 3,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -27,7 +26,6 @@ abstract class ChefhubDB: RoomDatabase() {
     abstract val usersDao: UsersDao
     abstract val recipesDao: RecipesDao
     abstract val categoriesDao: CategoriesDao
-    abstract val recipeCategoriesDao: RecipeCategoriesDao
     abstract val commentsDao: CommentsDao
     abstract val ratingsDao: RatingsDao
     abstract val favoritesDao: FavoritesDao
@@ -42,7 +40,7 @@ abstract class ChefhubDB: RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     ChefhubDB::class.java,
-                    "chefhub_database"
+                    "chefhub_db"
                 )
                     .fallbackToDestructiveMigration()
                     .build()

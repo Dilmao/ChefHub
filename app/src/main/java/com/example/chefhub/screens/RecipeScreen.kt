@@ -171,7 +171,7 @@ private fun RecipeDetailsSection(recipe: Recipes, appUiState: AppUiState) {
         RecipeDetailRow(
             icon = R.drawable.hat,
             label = "Dificultad",
-            value = "[placeholder]"
+            value = appUiState.recipe.dificulty ?: "N/A"
         )
         RecipeDetailRow(
             icon = R.drawable.preparation,
