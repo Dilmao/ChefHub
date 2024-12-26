@@ -38,7 +38,7 @@ class IntegratedTest {
 
     // Test Alert.
     @Test
-    fun testAlert() {
+    fun testAlertDialogLifecycle() {
         rule.setContent {
             var showAlert by remember { mutableStateOf(true) }
             if (showAlert) {
@@ -94,7 +94,7 @@ class IntegratedTest {
 
     // Test Cards.
     @Test
-    fun testRecipeCard() {
+    fun testRecipeCardDisplaysCorrectly() {
         rule.setContent {
             val prepHour = 1
             val prepMin = 30
