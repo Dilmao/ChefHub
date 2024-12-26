@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class AppViewModel(private val database: ChefhubDB): ViewModel() {
+open class AppViewModel(private val database: ChefhubDB): ViewModel() {
     private val _appUiState = MutableStateFlow(AppUiState())
     val appUiState: StateFlow<AppUiState> = _appUiState.asStateFlow()
 

@@ -63,27 +63,47 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
     // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation(libs.androidx.navigation.compose)
 
     // Room
     val roomVersion = "2.6.1"
-    implementation ("androidx.room:room-runtime:${roomVersion}")
-    implementation("androidx.room:room-ktx:${roomVersion}")
-    kapt("androidx.room:room-compiler:${roomVersion}")
+    implementation (libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
 
     // Gson
-    implementation("com.google.code.gson:gson:2.8.8")
+    implementation(libs.gson)
 
     // Coil
-    implementation("io.coil-kt:coil-compose:2.0.0")
+    implementation(libs.coil.compose)
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-analytics")
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.analytics)
     implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
     implementation(libs.androidx.foundation.layout.android)
+
+    // Test
+    androidTestImplementation(libs.androidx.junit.v121)
+    androidTestImplementation(libs.androidx.espresso.core.v361)
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    androidTestImplementation(libs.ui.test.junit4)
+    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.ui.test.manifest)
+
+
+    // Mockito
+//    testImplementation("io.mockk:mockk:1.13.4")
+//    testImplementation("androidx.compose.ui:ui-test-junit4:1.4.0")
+//    androidTestImplementation("io.mockk:mockk:1.13.4")
+//    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.0")
+//    androidTestImplementation("org.mockito:mockito-android:5.5.0")
+//    testImplementation("org.mockito:mockito-core:5.5.0")
+//    testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
+//    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -12,13 +12,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.navigation.NavController
 
 @Composable
 fun ClickableText(
     mensaje: String,                // Texto estático que precede al enlace.
     enlace: String,                 // Texto del enlace que se puede hacer clic.
-    onClick: () -> Unit,            // COMENTARIO.
+    onClick: () -> Unit,            // Función al pulsar el botón.
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
