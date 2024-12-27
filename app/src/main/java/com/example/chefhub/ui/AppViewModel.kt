@@ -372,12 +372,10 @@ open class AppViewModel(private val database: ChefhubDB): ViewModel() {
 
     /** Funciones Add Recipe **/
     fun saveRecipe(
-        context: Context,
         action: String,
-        callback: (Boolean) -> Unit
+        callback: (Int) -> Unit
     ) { // TODO: Asegurar que los campos obligatorios esta rellenados.
         val uiState = appUiState.value
-        val recipesRepository = RecipesRepository(database.recipesDao)
 
         val recipe = Recipes(
             userId = uiState.user.userId,
@@ -394,32 +392,31 @@ open class AppViewModel(private val database: ChefhubDB): ViewModel() {
         )
 
         if (recipe.title.isEmpty()) {
-            showMessage(context, "Título vacío")
-            callback(false)
+            callback(1)
+        } else if (recipe.title.length < 3 || recipe.title.length > 50) {
+            callback(2)
+        } else if (!recipe.imageUrl.isNullOrBlank() && !recipe.imageUrl.endsWith(".png") && !recipe.imageUrl.endsWith(".jpg")) {
+            callback(3)
+        } else if ((recipe.prepTime ?: 0) < 0 || (recipe.cookTime ?: 0) < 0) {
+            callback(0)
         } else {
             viewModelScope.launch {
                 try {
                     when (action.lowercase()) {
                         "create" -> {
-                            recipesRepository.insertRecipe(recipe)
-                            showMessage(context, "Receta creada con éxito.")
-                            callback(true)
+                            database.recipesDao.insertRecipe(recipe)
+                            callback(0)
                         }
                         "save" -> {
                             recipe.recipeId = uiState.recipe.recipeId
-                            recipesRepository.updateRecipe(recipe)
-                            showMessage(context, "Receta actualizada con éxito.")
-                            callback(true)
+                            callback(0)
                         }
                         else -> {
-                            showMessage(context, "Acción desconocida: $action.")
-                            callback(false)
+                            callback(5)
                         }
                     }
                 } catch (e: Exception) {
-                    val errorMsg = "Error al ${if (action == "create") "crear" else "guardar"} la receta: ${e.message}"
-                    showMessage(context, errorMsg)
-                    callback(false)
+                    callback(5)
                 }
             }
         }

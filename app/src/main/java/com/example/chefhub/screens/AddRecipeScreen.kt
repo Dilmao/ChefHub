@@ -1,5 +1,6 @@
 package com.example.chefhub.screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ import androidx.navigation.NavController
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.scaffold.MyMainBottomBar
 import com.example.chefhub.screens.components.SimpleTextField
+import com.example.chefhub.screens.components.showMessage
 import com.example.chefhub.ui.AppUiState
 import com.example.chefhub.ui.AppViewModel
 
@@ -106,23 +108,7 @@ private fun AddRecipeContent(navController: NavController, appViewModel: AppView
     }
 
     // Botón para crear la receta.
-    Row(
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp)
-    ) {
-        Button(onClick = {
-            appViewModel.saveRecipe(context, "create") { createSuccesfull ->
-                if (createSuccesfull) {
-                    navController.navigate(AppScreens.AccountScreen.route)
-                }
-            }
-        }) {
-            Text("Crear")
-        }
-    }
+    ButtonCreate(appViewModel, context, navController)
 }
 
 // Sección para el nombre de la receta.
@@ -305,4 +291,34 @@ private fun AddServingsSection(appUiState: AppUiState, appViewModel: AppViewMode
         onValueChange = { appViewModel.onRecipeChanged(it.toIntOrNull() ?: 0, "servings") },
         label = "Raciones"
     )
+}
+
+// Sección para el botón Crear.
+@Composable
+private fun ButtonCreate(appViewModel: AppViewModel, context: Context, navController: NavController) {
+    Row(
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+    ) {
+        Button(onClick = {
+            appViewModel.saveRecipe("create") { validation ->
+                when (validation) {
+                    1 -> showMessage(context, "Por favor, introduce un título para la receta.")
+                    2 -> showMessage(context, "El nombre de la receta debe tener entre 3 y 50 caracteres.")
+                    3 -> showMessage(context, "El formato de imagen no es válido. Asegúrate de subir una imagen en formato .png o .jpg.")
+                    4 -> showMessage(context, "El tiempo de preparación o cocción no puede ser menor a 0 minutos.")
+                    5 -> showMessage(context, "Error inesperado. Por favor, contacte con soporte técnico.")
+                    else -> {
+                        showMessage(context, "Receta creada con exito.")
+                        navController.navigate(AppScreens.AccountScreen.route)
+                    }
+                }
+            }
+        }) {
+            Text("Crear")
+        }
+    }
 }
