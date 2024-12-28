@@ -45,6 +45,7 @@ import com.example.chefhub.R
 import com.example.chefhub.db.data.Recipes
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.scaffold.MyMainBottomBar
+import com.example.chefhub.screens.components.DeleteConfirmationAlert
 import com.example.chefhub.screens.components.MiniCategoryCard
 import com.example.chefhub.screens.components.RecipeButton
 import com.example.chefhub.ui.AppUiState
@@ -336,6 +337,7 @@ private fun EditAndDeleteButtons(
     appViewModel: AppViewModel,
     navController: NavController
 ) {
+    var showDialog by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.Center,
@@ -353,9 +355,22 @@ private fun EditAndDeleteButtons(
             texto = "Borrar",
             type = "delete",
             onClick = {
-                appViewModel.onDeleteRecipe(recipe)
-                navController.navigate(AppScreens.AccountScreen.route)
+                showDialog = true
             }
         )
+    }
+
+    if (showDialog) {
+        DeleteConfirmationAlert(
+            itemType = "recipe"
+        ) { confirm ->
+            if (confirm) {
+                appViewModel.onDeleteRecipe(recipe)
+                navController.navigate(AppScreens.AccountScreen.route)
+                showDialog = false
+            } else {
+                showDialog = false
+            }
+        }
     }
 }

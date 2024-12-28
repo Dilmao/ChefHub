@@ -3,6 +3,7 @@ package com.example.chefhub.db
 import androidx.navigation.NavController
 import com.example.chefhub.navigation.AppScreens
 import com.example.chefhub.screens.components.ContentAlert
+import com.example.chefhub.screens.components.DeleteConfirmationAlert
 import com.example.chefhub.ui.AppViewModel
 
 // Data class que acepta una acción que utiliza AppViewModel.

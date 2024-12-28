@@ -43,3 +43,35 @@ fun PasswordRecoveryAlert(
         tonalElevation = 4.dp
     )
 }
+
+@Composable
+fun DeleteConfirmationAlert(
+    itemType: String,
+    confirm: (Boolean) -> Unit
+) {
+    var showDialog = true
+    val message = when(itemType) {
+        "user" -> "¿Está seguro de que desea eliminar este usuario? Esta acción no se puede deshacer."
+        "recipe" -> "¿Está seguro de que desea eliminar esta receta? Esta acción no se puede deshacer."
+        else -> ""
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            title = { Text("Confirmar eliminación", style = MaterialTheme.typography.titleMedium) },
+            text = { Text(message, style = MaterialTheme.typography.bodyMedium) },
+            onDismissRequest = { confirm(false); showDialog = false },
+            confirmButton = {
+                TextButton(onClick = { confirm(true); showDialog = false }) {
+                    Text("Aceptar", style = TextStyle(fontSize = 16.sp))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirm(false); showDialog = false }) {
+                    Text("Cancelar", style = TextStyle(fontSize = 16.sp))
+                }
+            },
+            tonalElevation = 4.dp
+        )
+    }
+}
