@@ -94,17 +94,6 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
 
-
-    // Mockito
-//    testImplementation("io.mockk:mockk:1.13.4")
-//    testImplementation("androidx.compose.ui:ui-test-junit4:1.4.0")
-//    androidTestImplementation("io.mockk:mockk:1.13.4")
-//    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.0")
-//    androidTestImplementation("org.mockito:mockito-android:5.5.0")
-//    testImplementation("org.mockito:mockito-core:5.5.0")
-//    testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
-//    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
