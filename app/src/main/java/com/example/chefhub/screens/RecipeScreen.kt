@@ -257,7 +257,7 @@ private fun RecipeDetailsSection(recipe: Recipes, appUiState: AppUiState) {
         )
         RecipeDetailRow(
             icon = R.drawable.timer,
-            label = "Tiempo total",
+            label = "Tiempo de cocción",
             value = "${appUiState.cookHour}:${appUiState.cookMin}"
         )
         RecipeDetailRow(
